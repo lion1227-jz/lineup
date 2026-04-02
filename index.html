@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - STARTING LINEUP V23</title>
+    <title>JZ BASEBALL TEAM - STARTING LINEUP V24</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -107,16 +107,14 @@
             padding-left: 2px; 
         }
 
-        /* 🌟 核心修正：強制鎖定寬度，確保 1~9 與 SP 佔據絕對相同空間 🌟 */
         .order-num { 
             font-family: 'Oswald', sans-serif; font-size: 24px; font-style: italic; color: #fff; 
-            width: 38px; min-width: 38px; flex-shrink: 0; /* 絕對鎖死寬度 */
+            width: 38px; min-width: 38px; flex-shrink: 0; 
             text-align: center; text-shadow: 2px 2px 0 #673AB7; 
         }
         
         .sp-num { 
             color: #B388FF; font-size: 24px; 
-            /* 不再設定寬度，交由 .order-num 的 38px 統一管理 */
         }
 
         .pos-box { 
@@ -129,11 +127,15 @@
         .pos-box span { transform: skewX(10deg); }
         .pos-select-hidden { position: absolute; opacity: 0; width: 50px; height: 34px; cursor: pointer; z-index: 5; }
 
+        /* 🌟 核心修正：加入內距與行高，釋放文字邊界空間，防止裁切 🌟 */
         .player-select { 
-            appearance: none; background: transparent; border: none; 
+            -webkit-appearance: none; -moz-appearance: none; appearance: none; /* 徹底抹除瀏覽器預設樣式 */
+            background: transparent; border: none; 
             color: #fff; font-size: 24px; font-weight: bold; cursor: pointer; outline: none; 
             width: 100%; 
             text-shadow: 2px 2px 4px #000;
+            padding: 4px 8px 4px 2px; /* 增加上方 4px、右側 8px 的呼吸空間 */
+            line-height: 1.3; /* 強制垂直撐開 */
         }
         .player-select option { color: #000; background: #fff; }
 
