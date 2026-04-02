@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - STARTING LINEUP V12</title>
+    <title>JZ BASEBALL TEAM - STARTING LINEUP V13</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -22,26 +22,21 @@
             width: 60%; padding: 20px 20px 20px 25px; z-index: 10; 
             background: linear-gradient(to right, #001529 90%, transparent);
             display: flex; flex-direction: column; 
-            position: relative; /* 🌟 確保 Logo 能在內部絕對定位 🌟 */
-            overflow: hidden; /* 🌟 確保放大後的 Logo 邊緣不會超出範圍 🌟 */
+            position: relative;
+            overflow: hidden;
         }
 
-        /* 🌟 終極修正：將浮水印延伸至整面左邊，並絕對置中 🌟 */
+        /* 大型全域浮水印 (隱隱約約) */
         .watermark-logo {
             position: absolute; 
-            top: 50%; /* 垂直置中起始點 */
-            left: 50%; /* 水平置中起始點 */
-            transform: translate(-50%, -50%); /* 完美修正偏移量，達到絕對置中 */
-            
-            width: 90%; /* 大幅放大尺寸，佔據左側九成空間 */
-            height: auto; /* 保持 Logo 比例 */
-            
-            opacity: 0.09; /* 🌟 因為變大了，透明度再調淡一點，確保隱隱約約 🌟 */
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 90%; height: auto;
+            opacity: 0.09;
             z-index: 0;
-            pointer-events: none; /* 確保不會擋到滑鼠點擊下拉選單 */
+            pointer-events: none;
         }
 
-        /* 確保文字與選單都在浮水印上方 */
+        /* 確保內容在浮水印上方 */
         .left-panel > *:not(.watermark-logo) {
             position: relative; z-index: 2;
         }
@@ -76,6 +71,7 @@
             padding-left: 10px;
         }
         
+        /* 古銅霧金 (#B89947) */
         .game-info-grid input, .game-info-grid select { 
             background: transparent; border: none; color: #B89947; font-size: 16px; font-weight: bold; outline: none; cursor: pointer; width: 100%;
         }
@@ -94,14 +90,25 @@
         .bench-col { grid-column: 3; display: flex; flex-direction: column; }
 
         .lineup-list { display: flex; flex-direction: column; gap: 7px; }
-        .lineup-row { display: flex; align-items: center; gap: 8px; }
+        
+        /* 🌟 更新：縮小整體行距，使背號更貼近名字 🌟 */
+        .lineup-row { display: flex; align-items: center; gap: 4px; } /* gap 從 8px 縮減至 4px */
         
         .order-num { font-family: 'Oswald', sans-serif; font-size: 24px; font-style: italic; color: #fff; width: 30px; text-align: right; text-shadow: 2px 2px 0 #673AB7; }
-        .sp-num { color: #B388FF; font-size: 20px;}
+        
+        /* SP 字體微調，確保與放大後的守位協調 */
+        .sp-num { color: #B388FF; font-size: 20px; width: 35px; text-align: center;}
 
-        .pos-box { background: #4A148C; color: #fff; font-family: 'Oswald', sans-serif; font-size: 16px; width: 38px; height: 26px; display: flex; justify-content: center; align-items: center; transform: skewX(-10deg); border-left: 3px solid #B89947; }
+        /* 🌟 重點 1：守備位置字體放大兩號 (從 16px 升級至 22px) 🌟 */
+        .pos-box { 
+            background: #4A148C; color: #fff; font-family: 'Oswald', sans-serif; 
+            font-size: 22px; /* 🌟 放大兩號 🌟 */
+            width: 48px; height: 32px; /* 稍微加大方塊容納大字體 */
+            display: flex; justify-content: center; align-items: center; 
+            transform: skewX(-10deg); border-left: 3px solid #B89947; 
+        }
         .pos-box span { transform: skewX(10deg); }
-        .pos-select-hidden { position: absolute; opacity: 0; width: 38px; height: 26px; cursor: pointer; z-index: 5; }
+        .pos-select-hidden { position: absolute; opacity: 0; width: 48px; height: 32px; cursor: pointer; z-index: 5; }
 
         .player-select { 
             appearance: none; background: transparent; border: none; 
@@ -110,16 +117,31 @@
         }
         .player-select option { color: #000; background: #fff; }
 
-        .jersey-num { font-family: 'Oswald', sans-serif; font-size: 22px; color: #B388FF; font-style: italic; opacity: 0; transition: 0.3s; width: 35px; text-align: left; }
+        /* 🌟 重點 2&3：背號大一號 (26px) & 離名字距離縮減 50% 🌟 */
+        .jersey-num { 
+            font-family: 'Oswald', sans-serif; 
+            font-size: 26px; /* 🌟 大一號 🌟 */
+            color: #B388FF; font-style: italic; 
+            opacity: 0; transition: 0.3s; 
+            width: 45px; /* 稍微加大寬度 */
+            text-align: left;
+            margin-left: 4px; /* 🌟 縮減與名字的距離 (50%) 🌟 */
+        }
         .jersey-num.active { opacity: 1; }
 
         .reserves-section { background: rgba(0,0,0,0.3); padding: 10px 10px; border-radius: 8px; border-left: 2px solid rgba(255,255,255,0.2); height: 100%; box-sizing: border-box; }
+        
+        /* 預備球員標題 (霧金) */
         .reserves-title { color: #B89947; font-size: 14px; margin-bottom: 8px; font-weight: bold; letter-spacing: 2px; border-left: 3px solid #B89947; padding-left: 8px; }
         
+        /* 預備球員區微調 */
         .reserves-list { display: flex; flex-direction: column; gap: 7px; }
-        .reserve-row { display: flex; align-items: center; width: 100%; gap: 6px;}
+        .reserve-row { display: flex; align-items: center; width: 100%; gap: 4px;} /* 縮減間距 */
         .reserve-row .player-select { font-size: 24px; width: 140px; }
-        .reserve-row .jersey-num { font-size: 22px; width: 35px; }
+        
+        /* 預備球員背號同步放大與貼近 */
+        .reserve-row .jersey-num { font-size: 26px; width: 45px; margin-left: 4px;}
+        
         .reserve-row .order-num { font-size: 24px; color: #888; width: 25px; text-align: right; text-shadow: none;}
 
         .btn-group { display: flex; gap: 12px; margin-top: 8px;}
