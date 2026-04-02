@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - STARTING LINEUP V8</title>
+    <title>JZ BASEBALL TEAM - STARTING LINEUP V9</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -11,7 +11,6 @@
 
         body { font-family: '微軟正黑體', Arial, sans-serif; background: #111; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; min-height: 100vh; color: #fff; }
 
-        /* 圖框自動貼合內容，消除底部多餘空間 */
         #capture-area {
             width: 1080px; height: auto; 
             background-color: #000;
@@ -25,15 +24,16 @@
             display: flex; flex-direction: column; 
         }
 
-        /* 🌟 右側背景大圖 (已更新為你的雲端硬碟圖檔) 🌟 */
+        /* 🌟 修正重點：載入雲端硬碟直連圖，並將對齊點設為靠右貼底 🌟 */
         .right-panel { 
             width: 40%; 
             background-image: url('https://lh3.googleusercontent.com/d/1UfvVaUAMRQ3EXtYLQQjOvvFGv8zmk0PN'); 
-            background-size: cover; background-position: center;
+            background-size: cover; 
+            background-position: right bottom; /* 讓右側的球員完整顯示，不再只剩頭 */
+            background-repeat: no-repeat;
             position: relative;
         }
 
-        /* Jz Baseball Team 置頂 */
         .vertical-text {
             position: absolute; top: 10px; right: 15px;
             font-family: 'Oswald', sans-serif; font-size: 16px; color: #B388FF;
@@ -49,10 +49,8 @@
             filter: drop-shadow(0 5px 15px rgba(0,0,0,0.8));
         }
 
-        /* STARTING LINEUP 縮小並上移 */
         .header-title { font-family: 'Oswald', sans-serif; font-size: 43px; font-style: italic; color: #fff; margin: -5px 0 5px 0; line-height: 1; letter-spacing: 2px; text-shadow: 4px 4px 0 #4A148C; }
         
-        /* 絕對對齊網格 */
         .game-info-grid { 
             display: grid; grid-template-columns: 1fr 1fr 1.25fr; 
             gap: 12px; padding-bottom: 10px; 
@@ -110,7 +108,6 @@
         .reserve-row .jersey-num { font-size: 22px; width: 35px; }
         .reserve-row .order-num { font-size: 24px; color: #888; width: 25px; text-align: right; text-shadow: none;}
 
-        /* 🌟 按鈕緊貼先發投手欄位下方 🌟 */
         .btn-group { display: flex; gap: 12px; margin-top: 8px;}
         button { font-size: 16px; padding: 10px 20px; font-weight: bold; color: #fff; border: none; border-radius: 8px; cursor: pointer; background: #4A148C; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         button:hover { background: #673AB7; transform: translateY(-2px); }
@@ -171,11 +168,13 @@
 
     <div class="right-panel">
         <div class="vertical-text">Jz Baseball Team</div>
-        <img class="jz-logo" src="https://lh3.googleusercontent.com/d/1aooCsOuMMtwMhT5bay4kDQCAq9sbm3kW" alt="JZ Logo" crossorigin="anonymous">
+        <img class="jz-logo" src="https://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png" alt="" crossorigin="anonymous" id="dynamic-logo">
     </div>
 </div>
 
 <script>
+    /* 注入你的 JZ Logo (為了確保載入順利，用 JS 載入) */
+    document.getElementById('dynamic-logo').src = "https://lh3.googleusercontent.com/d/1aooCsOuMMtwMhT5bay4kDQCAq9sbm3kW";
     document.getElementById('game-date').value = new Date().toISOString().split('T')[0];
 
     const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQE8qU7MUo8mltMrnQSLttK1ePGuN2ooTaD3QBtoKsmvrW5tEKOjSXwGm9bwhZtgy2veLF-QLTpe33q/pub?output=csv";
