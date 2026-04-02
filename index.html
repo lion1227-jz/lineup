@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - STARTING LINEUP V10</title>
+    <title>JZ BASEBALL TEAM - STARTING LINEUP V11</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -22,6 +22,21 @@
             width: 60%; padding: 20px 20px 20px 25px; z-index: 10; 
             background: linear-gradient(to right, #001529 90%, transparent);
             display: flex; flex-direction: column; 
+            position: relative;
+        }
+
+        /* 🌟 左下角 Logo 浮水印 (不干擾視線) 🌟 */
+        .watermark-logo {
+            position: absolute; bottom: 20px; left: 20px;
+            width: 350px; height: 350px;
+            opacity: 0.12; /* 透明度調低，隱隱約約 */
+            z-index: 0;
+            pointer-events: none; /* 確保不會擋到滑鼠點擊下拉選單 */
+        }
+
+        /* 確保文字與選單都在浮水印上方 */
+        .left-panel > *:not(.watermark-logo) {
+            position: relative; z-index: 2;
         }
 
         .right-panel { 
@@ -41,13 +56,6 @@
             z-index: 15; text-shadow: 1px 1px 2px #000;
         }
 
-        .jz-logo {
-            position: absolute; bottom: 20px; right: 20px;
-            width: 150px; height: 150px;
-            z-index: 20;
-            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.8));
-        }
-
         .header-title { font-family: 'Oswald', sans-serif; font-size: 43px; font-style: italic; color: #fff; margin: -5px 0 5px 0; line-height: 1; letter-spacing: 2px; text-shadow: 4px 4px 0 #4A148C; }
         
         .game-info-grid { 
@@ -61,9 +69,9 @@
             padding-left: 10px;
         }
         
-        /* 🌟 將原本的亮藍色換成 Logo 黃金色 (#FFD700) 🌟 */
+        /* 🌟 將亮金改成有質感的「古銅霧金」(#B89947) 🌟 */
         .game-info-grid input, .game-info-grid select { 
-            background: transparent; border: none; color: #FFD700; font-size: 16px; font-weight: bold; outline: none; cursor: pointer; width: 100%;
+            background: transparent; border: none; color: #B89947; font-size: 16px; font-weight: bold; outline: none; cursor: pointer; width: 100%;
         }
 
         input[type="date"]::-webkit-calendar-picker-indicator,
@@ -85,8 +93,8 @@
         .order-num { font-family: 'Oswald', sans-serif; font-size: 24px; font-style: italic; color: #fff; width: 30px; text-align: right; text-shadow: 2px 2px 0 #673AB7; }
         .sp-num { color: #B388FF; font-size: 20px;}
 
-        /* 🌟 守位方塊的左側裝飾線也換成黃金色 🌟 */
-        .pos-box { background: #4A148C; color: #fff; font-family: 'Oswald', sans-serif; font-size: 16px; width: 38px; height: 26px; display: flex; justify-content: center; align-items: center; transform: skewX(-10deg); border-left: 3px solid #FFD700; }
+        /* 🌟 守位方塊的左側裝飾線換成霧金 🌟 */
+        .pos-box { background: #4A148C; color: #fff; font-family: 'Oswald', sans-serif; font-size: 16px; width: 38px; height: 26px; display: flex; justify-content: center; align-items: center; transform: skewX(-10deg); border-left: 3px solid #B89947; }
         .pos-box span { transform: skewX(10deg); }
         .pos-select-hidden { position: absolute; opacity: 0; width: 38px; height: 26px; cursor: pointer; z-index: 5; }
 
@@ -102,8 +110,8 @@
 
         .reserves-section { background: rgba(0,0,0,0.3); padding: 10px 10px; border-radius: 8px; border-left: 2px solid rgba(255,255,255,0.2); height: 100%; box-sizing: border-box; }
         
-        /* 🌟 預備球員標題與左側裝飾線換成黃金色 🌟 */
-        .reserves-title { color: #FFD700; font-size: 14px; margin-bottom: 8px; font-weight: bold; letter-spacing: 2px; border-left: 3px solid #FFD700; padding-left: 8px; }
+        /* 🌟 預備球員標題與左側裝飾線換成霧金 🌟 */
+        .reserves-title { color: #B89947; font-size: 14px; margin-bottom: 8px; font-weight: bold; letter-spacing: 2px; border-left: 3px solid #B89947; padding-left: 8px; }
         
         .reserves-list { display: flex; flex-direction: column; gap: 7px; }
         .reserve-row { display: flex; align-items: center; width: 100%; gap: 6px;}
@@ -121,6 +129,8 @@
 
 <div id="capture-area">
     <div class="left-panel">
+        <img class="watermark-logo" src="https://lh3.googleusercontent.com/d/1aooCsOuMMtwMhT5bay4kDQCAq9sbm3kW" crossorigin="anonymous" alt="Watermark">
+
         <h1 class="header-title">STARTING LINEUP</h1>
         
         <div class="game-info-grid">
@@ -171,13 +181,10 @@
 
     <div class="right-panel">
         <div class="vertical-text">Jz Baseball Team</div>
-        <img class="jz-logo" src="https://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png" alt="" crossorigin="anonymous" id="dynamic-logo">
-    </div>
+        </div>
 </div>
 
 <script>
-    /* 載入你的 JZ Logo */
-    document.getElementById('dynamic-logo').src = "https://lh3.googleusercontent.com/d/1aooCsOuMMtwMhT5bay4kDQCAq9sbm3kW";
     document.getElementById('game-date').value = new Date().toISOString().split('T')[0];
 
     const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQE8qU7MUo8mltMrnQSLttK1ePGuN2ooTaD3QBtoKsmvrW5tEKOjSXwGm9bwhZtgy2veLF-QLTpe33q/pub?output=csv";
@@ -230,84 +237,4 @@
             const p = playersData.find(x => x.name === pSelect.value);
             if (p && p.num) {
                 jerseyNum.textContent = '#' + p.num;
-                jerseyNum.classList.add('active');
-            } else {
-                jerseyNum.textContent = '';
-                jerseyNum.classList.remove('active');
-            }
-            validateForm();
-        });
-
-        if (type === 'starter') {
-            posHidden.innerHTML = '<option value="">位</option>' + posList.map(pos => `<option value="${pos}">${pos}</option>`).join('');
-        }
-
-        container.appendChild(row);
-    }
-
-    function setupPitcherJersey() {
-        const pRow = document.getElementById('sp-row');
-        const pSelect = pRow.querySelector('.player-select');
-        const jerseyNum = pRow.querySelector('.jersey-num');
-
-        pSelect.addEventListener('change', () => {
-            const p = playersData.find(x => x.name === pSelect.value);
-            if (p && p.num) {
-                jerseyNum.textContent = '#' + p.num;
-                jerseyNum.classList.add('active');
-            } else {
-                jerseyNum.textContent = '';
-                jerseyNum.classList.remove('active');
-            }
-            validateForm();
-        });
-    }
-
-    for (let i = 1; i <= 9; i++) createRow(i, 'starter', document.getElementById('starters-board'));
-    setupPitcherJersey();
-    for (let i = 1; i <= 8; i++) createRow(i, 'reserve', document.getElementById('reserves-board'));
-
-    Papa.parse(GOOGLE_SHEET_URL, {
-        download: true,
-        header: false,
-        complete: function(results) {
-            const data = results.data.slice(1);
-            playersData = data.map(row => ({ 
-                num: String(row[0]||"").trim(), 
-                name: String(row[1]||"").trim() 
-            })).filter(p => p.name !== "");
-            
-            const locations = Array.from(new Set(data.map(row => String(row[2]||"").trim()))).filter(loc => loc !== "");
-
-            document.getElementById('game-location').innerHTML = '<option value="">選擇球場...</option>' + locations.map(loc => `<option value="${loc}">${loc}</option>`).join('');
-            
-            document.querySelectorAll('.player-select').forEach(select => {
-                playersData.forEach(p => {
-                    const opt = document.createElement('option');
-                    opt.value = p.name; opt.textContent = p.name;
-                    select.appendChild(opt);
-                });
-            });
-        }
-    });
-
-    async function handleShare() {
-        const btnGroup = document.querySelector('.btn-group');
-        btnGroup.style.opacity = '0'; 
-        await new Promise(r => setTimeout(r, 100));
-        
-        const canvas = await html2canvas(document.getElementById('capture-area'), { scale: 2, useCORS: true, backgroundColor: null });
-        btnGroup.style.opacity = '1'; 
-
-        canvas.toBlob(async (blob) => {
-            const file = new File([blob], 'JZ_StartingLineup.png', { type: 'image/png' });
-            if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file] });
-            else { const link = document.createElement('a'); link.download = 'JZ_StartingLineup.png'; link.href = URL.createObjectURL(blob); link.click(); }
-        });
-    }
-
-    document.getElementById('export-btn').onclick = handleShare;
-    document.getElementById('share-line-btn').onclick = handleShare;
-</script>
-</body>
-</html>
+                jerseyNum.classList.
