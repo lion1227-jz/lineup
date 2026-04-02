@@ -3,25 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - STARTING LINEUP V5</title>
+    <title>JZ BASEBALL TEAM - STARTING LINEUP V6</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap');
 
-        /* 🌟 整體往左上靠齊，取消多餘空白 🌟 */
-        body { font-family: '微軟正黑體', Arial, sans-serif; background: #111; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; color: #fff; }
+        /* 🌟 整體往左上角靠齊，取消置中，減少外圍留白 🌟 */
+        body { font-family: '微軟正黑體', Arial, sans-serif; background: #111; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; min-height: 100vh; color: #fff; }
 
-        /* 🌟 縮小總尺寸，適應單螢幕免滾動 (1100x760) 🌟 */
+        /* 🌟 縮小總尺寸與內部邊距，版面更緊湊 🌟 */
         #capture-area {
-            width: 1100px; height: 760px; 
+            width: 1080px; height: 740px; 
             background-color: #000;
             display: flex; position: relative; overflow: visible;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.8);
         }
 
         .left-panel { 
-            width: 60%; padding: 30px 20px 30px 30px; z-index: 10; 
+            width: 60%; padding: 25px 20px 25px 25px; z-index: 10; 
             background: linear-gradient(to right, #001529 90%, transparent);
             display: flex; flex-direction: column; 
         }
@@ -34,7 +34,7 @@
         }
 
         .vertical-text {
-            position: absolute; top: 80px; right: 15px;
+            position: absolute; top: 70px; right: 15px;
             font-family: 'Oswald', sans-serif; font-size: 16px; color: #B388FF;
             text-transform: uppercase; letter-spacing: 5px;
             writing-mode: vertical-rl; text-orientation: mixed;
@@ -43,75 +43,75 @@
 
         .jz-logo {
             position: absolute; bottom: 20px; right: 20px;
-            width: 160px; height: 160px; /* 稍微縮小配合緊湊版面 */
+            width: 150px; height: 150px;
             z-index: 20;
             filter: drop-shadow(0 5px 15px rgba(0,0,0,0.8));
         }
 
-        .header-title { font-family: 'Oswald', sans-serif; font-size: 50px; font-style: italic; color: #fff; margin: 0; line-height: 1; letter-spacing: 2px; text-shadow: 4px 4px 0 #4A148C; }
+        .header-title { font-family: 'Oswald', sans-serif; font-size: 48px; font-style: italic; color: #fff; margin: 0; line-height: 1; letter-spacing: 2px; text-shadow: 4px 4px 0 #4A148C; }
         
-        /* 🌟 絕對對齊魔法：設定共用的網格欄位 (1 : 1 : 1.25) 🌟 */
+        /* 🌟 絕對對齊魔法：將邊線改畫在第2、3欄的左側，完美切齊下方網格 🌟 */
         .game-info-grid { 
             display: grid; grid-template-columns: 1fr 1fr 1.25fr; 
-            gap: 12px; margin-top: 15px; padding-bottom: 12px; 
+            gap: 12px; margin-top: 10px; padding-bottom: 10px; 
             border-bottom: 2px solid rgba(255,255,255,0.3); margin-bottom: 15px; 
         }
-        .info-cell { display: flex; align-items: center; gap: 8px; border-right: 1px solid rgba(255,255,255,0.2); }
-        .info-cell:last-child { border-right: none; padding-left: 5px;}
+        .info-cell { display: flex; align-items: center; gap: 8px; }
+        .info-cell:nth-child(3n+2), .info-cell:nth-child(3n+3) {
+            border-left: 2px solid rgba(255,255,255,0.2);
+            padding-left: 10px;
+        }
         
         .game-info-grid input, .game-info-grid select { 
             background: transparent; border: none; color: #00d4ff; font-size: 16px; font-weight: bold; outline: none; cursor: pointer; width: 100%;
         }
 
-        /* 🌟 套用相同的網格，先發佔前2格，預備佔第3格 🌟 */
-        .roster-split {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1.25fr;
-            gap: 12px;
-            flex: 1;
-        }
-        
-        .starters-col {
-            grid-column: 1 / span 2; /* 橫跨前兩欄 */
-            display: flex; flex-direction: column;
-        }
-        
-        .bench-col {
-            grid-column: 3; /* 精準對齊第三欄 */
-            display: flex; flex-direction: column;
+        /* 🌟 日曆與時鐘圖示：強制反轉並加倍亮度 🌟 */
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(1) brightness(2);
+            cursor: pointer;
+            opacity: 1;
         }
 
-        .lineup-list { display: flex; flex-direction: column; gap: 8px; }
+        /* 🌟 套用相同的網格比例 🌟 */
+        .roster-split {
+            display: grid; grid-template-columns: 1fr 1fr 1.25fr; gap: 12px; flex: 1;
+        }
+        
+        .starters-col { grid-column: 1 / span 2; display: flex; flex-direction: column; }
+        .bench-col { grid-column: 3; display: flex; flex-direction: column; }
+
+        .lineup-list { display: flex; flex-direction: column; gap: 7px; }
         .lineup-row { display: flex; align-items: center; gap: 8px; }
         
-        /* 配合緊湊版面微調文字大小 */
-        .order-num { font-family: 'Oswald', sans-serif; font-size: 26px; font-style: italic; color: #fff; width: 30px; text-align: right; text-shadow: 2px 2px 0 #673AB7; }
-        .sp-num { color: #B388FF; font-size: 22px;}
+        .order-num { font-family: 'Oswald', sans-serif; font-size: 24px; font-style: italic; color: #fff; width: 30px; text-align: right; text-shadow: 2px 2px 0 #673AB7; }
+        .sp-num { color: #B388FF; font-size: 20px;}
 
-        .pos-box { background: #4A148C; color: #fff; font-family: 'Oswald', sans-serif; font-size: 18px; width: 40px; height: 28px; display: flex; justify-content: center; align-items: center; transform: skewX(-10deg); border-left: 3px solid #00d4ff; }
+        .pos-box { background: #4A148C; color: #fff; font-family: 'Oswald', sans-serif; font-size: 16px; width: 38px; height: 26px; display: flex; justify-content: center; align-items: center; transform: skewX(-10deg); border-left: 3px solid #00d4ff; }
         .pos-box span { transform: skewX(10deg); }
-        .pos-select-hidden { position: absolute; opacity: 0; width: 40px; height: 28px; cursor: pointer; z-index: 5; }
+        .pos-select-hidden { position: absolute; opacity: 0; width: 38px; height: 26px; cursor: pointer; z-index: 5; }
 
         .player-select { 
             appearance: none; background: transparent; border: none; 
-            color: #fff; font-size: 26px; font-weight: bold; cursor: pointer; outline: none; 
-            width: 170px; text-shadow: 2px 2px 4px #000;
+            color: #fff; font-size: 24px; font-weight: bold; cursor: pointer; outline: none; 
+            width: 160px; text-shadow: 2px 2px 4px #000;
         }
         .player-select option { color: #000; background: #fff; }
 
         .jersey-num { font-family: 'Oswald', sans-serif; font-size: 22px; color: #B388FF; font-style: italic; opacity: 0; transition: 0.3s; width: 35px; text-align: left; }
         .jersey-num.active { opacity: 1; }
 
-        .reserves-section { background: rgba(0,0,0,0.3); padding: 10px 12px; border-radius: 8px; border-left: 2px solid rgba(255,255,255,0.1); height: 100%; box-sizing: border-box; }
-        .reserves-title { color: #00d4ff; font-size: 13px; margin-bottom: 10px; font-weight: bold; letter-spacing: 2px; border-left: 3px solid #00d4ff; padding-left: 8px; }
+        /* 🌟 左側邊線寬度與顏色完全對應上方的 border-left 🌟 */
+        .reserves-section { background: rgba(0,0,0,0.3); padding: 10px 10px; border-radius: 8px; border-left: 2px solid rgba(255,255,255,0.2); height: 100%; box-sizing: border-box; }
+        .reserves-title { color: #00d4ff; font-size: 14px; margin-bottom: 8px; font-weight: bold; letter-spacing: 2px; border-left: 3px solid #00d4ff; padding-left: 8px; }
         .reserves-list { display: flex; flex-direction: column; gap: 6px; }
         .reserve-row { display: flex; align-items: center; width: 100%; gap: 5px;}
         .reserve-row .player-select { font-size: 18px; width: 100px; }
         .reserve-row .jersey-num { font-size: 16px; width: 25px; }
         .reserve-row .order-num { font-size: 16px; color: #888; width: 20px; text-shadow: none;}
 
-        /* 🌟 按鈕區塊：現在已經包在左側圖框內了 🌟 */
-        .btn-group { display: flex; gap: 12px; margin-top: auto; padding-top: 15px;}
+        .btn-group { display: flex; gap: 12px; margin-top: auto; padding-top: 10px;}
         button { font-size: 16px; padding: 10px 20px; font-weight: bold; color: #fff; border: none; border-radius: 8px; cursor: pointer; background: #4A148C; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         button:hover { background: #673AB7; transform: translateY(-2px); }
         #share-line-btn { background: #06C755; }
@@ -155,14 +155,14 @@
                 </div>
 
                 <div class="btn-group">
-                    <button id="export-btn">📸 下載 JZ 隊報</button>
+                    <button id="export-btn">📸 下載圖檔</button>
                     <button id="share-line-btn">🟢 分享至 LINE</button>
                 </div>
             </div>
 
             <div class="bench-col">
                 <div class="reserves-section">
-                    <div class="reserves-title">BENCH PLAYERS</div>
+                    <div class="reserves-title">預備球員</div>
                     <div class="reserves-list" id="reserves-board"></div>
                 </div>
             </div>
@@ -289,19 +289,12 @@
         }
     });
 
-    // 🌟 按鈕截圖時的隱形魔法 🌟
     async function handleShare() {
         const btnGroup = document.querySelector('.btn-group');
-        
-        // 截圖前：把按鈕變透明，不破壞排版高度
         btnGroup.style.opacity = '0'; 
-        
-        // 稍微等一下確保畫面重繪完畢
         await new Promise(r => setTimeout(r, 100));
         
         const canvas = await html2canvas(document.getElementById('capture-area'), { scale: 2, useCORS: true, backgroundColor: null });
-        
-        // 截圖後：馬上把按鈕變回來
         btnGroup.style.opacity = '1'; 
 
         canvas.toBlob(async (blob) => {
