@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JZ BASEBALL TEAM - STARTING LINEUP</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap');
+
+        body { font-family: '微軟正黑體', Arial, sans-serif; background: #111; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: #fff; }
+
+        #capture-area {
+            width: 1200px; height: 850px; 
+            background-color: #000;
+            display: flex; position: relative; overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        /* 左側：名單區 (深藍底) */
+        .left-panel { 
+            width: 50%; padding: 40px 30px 40px 50px; z-index: 10; 
+            background: linear-gradient(to right, #001529 85%, transparent);
+            display: flex; flex-direction: column; 
+        }
+
+        /* 右側：背景大圖 (飛機球場圖) */
+        .right-panel { 
+            width: 50%; 
+            background-image: url('https://lh3.googleusercontent.com/d/1vNdTLpYSVeh6FwwGmErapoPO_NEDIg56'); /* 這裡用你的球場背景圖 */
+            background-size: cover; background-position: center;
+            position: relative;
+        }
+
+        /* 右下角 JZ Logo */
+        .jz-logo {
+            position: absolute; bottom: 30px; right: 30px;
+            width: 220px; height: 220px;
+            z-index: 20;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+        }
+
+        .header-title { font-family: 'Oswald', sans-serif; font-size: 65px; font-style: italic; color: #fff; margin: 0; line-height: 1; letter-spacing: 2px; text-shadow: 4px 4px 0 #4A148C; }
+        
+        .game-info-bar { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; padding-bottom: 15px; border-bottom: 2px solid rgba(255,255,255,0.3); margin-bottom: 25px; }
+        .info-line { display: flex; align-items: center; gap: 12px; }
+        
+        .game-info-bar input, .game-info-bar select { 
+            background: transparent; border: none; color: #00d4ff; font-size: 22px; font-weight: bold; outline: none; cursor: pointer;
+        }
+        .divider { color: #fff; opacity: 0.5; }
+
+        .lineup-list { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+        .lineup-row { display: flex; align-items: center; gap: 15px; }
+        
+        .order-num { font-family: 'Oswald', sans-serif; font-size: 32px; font-style: italic; color: #fff; width: 40px; text-align: right; text-shadow: 2px 2px 0 #673AB7; }
+        .sp-num { color: #B388FF; }
+
+        /* 守備位置方塊 */
+        .pos-box { background: #4A148C; color: #fff; font-family: 'Oswald', sans-serif; font-size: 22px; width: 50px; height: 35px; display: flex; justify-content: center; align-items: center; transform: skewX(-10deg); border-left: 4px solid #00d4ff; }
+        .pos-box span { transform: skewX(10deg); }
+        .pos-select-hidden { position: absolute; opacity: 0; width: 50px; height: 35px; cursor: pointer; z-index: 5; }
+
+        .player-select { 
+            appearance: none; background: transparent; border: none; 
+            color: #fff; font-size: 36px; font-weight: bold; cursor: pointer; outline: none; 
+            width: 300px; text-shadow: 2px 2px 4px #000;
+        }
+        .player-select option { color: #000; background: #fff; }
+
+        /* 預備球員區 */
+        .reserves-section { margin-top: 20px; background: rgba(0,0,0,0.7); padding: 15px; border-radius: 5px; }
+        .reserves-title { color: #00d4ff; font-size: 14px; margin-bottom: 10px; font-weight: bold; letter-spacing: 3px; border-left: 3px solid #00d4ff; padding-left: 10px; }
+        .reserves-grid { display: flex; flex-wrap: wrap; gap: 10px 20px; }
+        .reserve-row { display: flex; align-items: center; width: 45%; }
+        .reserve-row .player-select { font-size: 24px; width: 160px; }
+
+        .btn-group { display: flex; gap: 20px; margin-top: 30px; }
+        button { font-size: 22px; padding: 15px 35px; font-weight: bold; color: #fff; border: none; border-radius: 10px; cursor: pointer; background: #4A148C; transition: 0.3s; }
+        button:hover { background: #673AB7; transform: translateY(-2px); }
+        #share-line-btn { background: #06C755; }
+    </style>
+</head>
+<body>
+
+<div id="capture-area">
+    <div class="left-panel">
+        <h1 class="header-title">STARTING LINEUP</h1>
+        
+        <div class="game-info-bar">
+            <div class="info-line">
+                <input type="date" id="game-date">
+                <span class="divider">|</span>
+                <input type="time" value="08:00">
+                <span class="divider">|</span>
+                <input type="time" value="09:00">
+            </div>
+            <div class="info-line">
+                <select id="game-location" style="width: 150px;"><option value="">選擇球場...</option></select>
+                <span class="divider">|</span>
+                <select id="bench-side"><option value="">休息區</option><option value="一壘側">一壘側</option><option value="三壘側">三壘側</option></select>
+                <span class="divider">|</span>
+                <input type="text" placeholder="輸入對手..." style="width:180px;">
+            </div>
+        </div>
+
+        <div class="lineup-list" id="starters-board"></div>
+        
+        <div class="lineup-list" style="margin-top: 15px;">
+            <div class="lineup-row">
+                <div class="order-num sp-num">SP</div>
+                <div style="position:relative;">
+                    <select class="pos-select-hidden" disabled><option value="P">P</option></select>
+                    <div class="pos-box"><span>P</span></div>
+                </div>
+                <select class="player-select"><option value="">-- 先發投手 --</option></select>
+            </div>
+        </div>
+
+        <div class="reserves-section">
+            <div class="reserves-title">BENCH PLAYERS</div>
+            <div class="reserves-grid" id="reserves-board"></div>
+        </div>
+    </div>
+
+    <div class="right-panel">
+        <img class="jz-logo" src="https://lh3.googleusercontent.com/d/1aooCsOuMMtwMhT5bay4kDQCAq9sbm3kW" alt="JZ Logo" crossorigin="anonymous">
+    </div>
+</div>
+
+<div class="btn-group">
+    <button id="export-btn">📸 下載 JZ 隊報</button>
+    <button id="share-line-btn">🟢 分享至 LINE</button>
+</div>
+
+<script>
+    document.getElementById('game-date').value = new Date().toISOString().split('T')[0];
+
+    const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQE8qU7MUo8mltMrnQSLttK1ePGuN2ooTaD3QBtoKsmvrW5tEKOjSXwGm9bwhZtgy2veLF-QLTpe33q/pub?output=csv";
+    let playersData = [];
+    const posList = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH"];
+
+    function validateForm() {
+        const pSelects = Array.from(document.querySelectorAll('.player-select'));
+        const pValues = pSelects.map(s => s.value).filter(v => v !== "");
+        pSelects.forEach(select => {
+            if (select.value === "") select.style.color = "#fff";
+            else {
+                const count = pValues.filter(v => v === select.value).length;
+                select.style.color = count > 1 ? "#FF3B30" : "#fff";
+            }
+        });
+    }
+
+    function createRow(index, type, container) {
+        const row = document.createElement('div');
+        row.className = type === 'reserve' ? 'reserve-row' : 'lineup-row';
+        let numHtml = (type === 'starter') ? `<div class="order-num">${index}</div>` : '';
+
+        row.innerHTML = `
+            ${numHtml}
+            <div style="position:relative;">
+                <select class="pos-select-hidden"></select>
+                <div class="pos-box"><span class="pos-text">-</span></div>
+            </div>
+            <select class="player-select"><option value="">-- 球員 --</option></select>
+        `;
+
+        const pSelect = row.querySelector('.player-select');
+        const posHidden = row.querySelector('.pos-select-hidden');
+        const posText = row.querySelector('.pos-text');
+
+        posHidden.addEventListener('change', (e) => { posText.textContent = e.target.value || '-'; });
+        pSelect.addEventListener('change', validateForm);
+        container.appendChild(row);
+    }
+
+    for (let i = 1; i <= 9; i++) createRow(i, 'starter', document.getElementById('starters-board'));
+    for (let i = 1; i <= 6; i++) createRow(i, 'reserve', document.getElementById('reserves-board'));
+
+    Papa.parse(GOOGLE_SHEET_URL, {
+        download: true,
+        header: false,
+        complete: function(results) {
+            const data = results.data.slice(1);
+            playersData = data.map(row => ({ name: String(row[1]||"").trim() })).filter(p => p.name !== "");
+            const locations = Array.from(new Set(data.map(row => String(row[2]||"").trim()))).filter(loc => loc !== "");
+
+            document.getElementById('game-location').innerHTML = '<option value="">選擇球場...</option>' + locations.map(loc => `<option value="${loc}">${loc}</option>`).join('');
+            document.querySelectorAll('.player-select').forEach(select => {
+                playersData.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.name; opt.textContent = p.name;
+                    select.appendChild(opt);
+                });
+            });
+            document.querySelectorAll('.pos-select-hidden').forEach(select => {
+                if(select.disabled) return;
+                select.innerHTML = '<option value="">位</option>' + posList.map(pos => `<option value="${pos}">${pos}</option>`).join('');
+            });
+        }
+    });
+
+    async function handleShare() {
+        const canvas = await html2canvas(document.getElementById('capture-area'), { scale: 2, useCORS: true });
+        canvas.toBlob(async (blob) => {
+            const file = new File([blob], 'jz_lineup.png', { type: 'image/png' });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file] });
+            else { const link = document.createElement('a'); link.download = 'jz_lineup.png'; link.href = URL.createObjectURL(blob); link.click(); }
+        });
+    }
+
+    document.getElementById('export-btn').onclick = handleShare;
+    document.getElementById('share-line-btn').onclick = handleShare;
+</script>
+</body>
+</html>
