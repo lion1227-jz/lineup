@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - STARTING LINEUP V11</title>
+    <title>JZ BASEBALL TEAM - STARTING LINEUP V12</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -22,14 +22,21 @@
             width: 60%; padding: 20px 20px 20px 25px; z-index: 10; 
             background: linear-gradient(to right, #001529 90%, transparent);
             display: flex; flex-direction: column; 
-            position: relative;
+            position: relative; /* 🌟 確保 Logo 能在內部絕對定位 🌟 */
+            overflow: hidden; /* 🌟 確保放大後的 Logo 邊緣不會超出範圍 🌟 */
         }
 
-        /* 🌟 左下角 Logo 浮水印 (不干擾視線) 🌟 */
+        /* 🌟 終極修正：將浮水印延伸至整面左邊，並絕對置中 🌟 */
         .watermark-logo {
-            position: absolute; bottom: 20px; left: 20px;
-            width: 350px; height: 350px;
-            opacity: 0.12; /* 透明度調低，隱隱約約 */
+            position: absolute; 
+            top: 50%; /* 垂直置中起始點 */
+            left: 50%; /* 水平置中起始點 */
+            transform: translate(-50%, -50%); /* 完美修正偏移量，達到絕對置中 */
+            
+            width: 90%; /* 大幅放大尺寸，佔據左側九成空間 */
+            height: auto; /* 保持 Logo 比例 */
+            
+            opacity: 0.09; /* 🌟 因為變大了，透明度再調淡一點，確保隱隱約約 🌟 */
             z-index: 0;
             pointer-events: none; /* 確保不會擋到滑鼠點擊下拉選單 */
         }
@@ -69,7 +76,6 @@
             padding-left: 10px;
         }
         
-        /* 🌟 將亮金改成有質感的「古銅霧金」(#B89947) 🌟 */
         .game-info-grid input, .game-info-grid select { 
             background: transparent; border: none; color: #B89947; font-size: 16px; font-weight: bold; outline: none; cursor: pointer; width: 100%;
         }
@@ -93,7 +99,6 @@
         .order-num { font-family: 'Oswald', sans-serif; font-size: 24px; font-style: italic; color: #fff; width: 30px; text-align: right; text-shadow: 2px 2px 0 #673AB7; }
         .sp-num { color: #B388FF; font-size: 20px;}
 
-        /* 🌟 守位方塊的左側裝飾線換成霧金 🌟 */
         .pos-box { background: #4A148C; color: #fff; font-family: 'Oswald', sans-serif; font-size: 16px; width: 38px; height: 26px; display: flex; justify-content: center; align-items: center; transform: skewX(-10deg); border-left: 3px solid #B89947; }
         .pos-box span { transform: skewX(10deg); }
         .pos-select-hidden { position: absolute; opacity: 0; width: 38px; height: 26px; cursor: pointer; z-index: 5; }
@@ -109,8 +114,6 @@
         .jersey-num.active { opacity: 1; }
 
         .reserves-section { background: rgba(0,0,0,0.3); padding: 10px 10px; border-radius: 8px; border-left: 2px solid rgba(255,255,255,0.2); height: 100%; box-sizing: border-box; }
-        
-        /* 🌟 預備球員標題與左側裝飾線換成霧金 🌟 */
         .reserves-title { color: #B89947; font-size: 14px; margin-bottom: 8px; font-weight: bold; letter-spacing: 2px; border-left: 3px solid #B89947; padding-left: 8px; }
         
         .reserves-list { display: flex; flex-direction: column; gap: 7px; }
@@ -181,7 +184,7 @@
 
     <div class="right-panel">
         <div class="vertical-text">Jz Baseball Team</div>
-        </div>
+    </div>
 </div>
 
 <script>
