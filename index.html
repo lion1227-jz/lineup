@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - STARTING LINEUP V20</title>
+    <title>JZ BASEBALL TEAM - STARTING LINEUP V21</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -88,7 +88,6 @@
 
         .lineup-list { display: flex; flex-direction: column; gap: 7px; }
         
-        /* 🌟 優化：將間距縮小到 16px (大約 1 個字元寬度) 🌟 */
         .lineup-row { 
             display: flex; align-items: center; 
             gap: 16px; 
@@ -128,6 +127,8 @@
             opacity: 0; transition: 0.3s; 
             width: 45px; 
             text-align: left;
+            /* 🌟 利用負邊距抵消一半的 gap (16px / 2 = 8px) 🌟 */
+            margin-left: -8px; 
         }
         .jersey-num.active { opacity: 1; }
 
@@ -137,10 +138,10 @@
         
         .reserves-list { display: flex; flex-direction: column; gap: 7px; }
         
-        /* 🌟 預備球員區同步套用 16px 的等距間隔 🌟 */
         .reserve-row { display: flex; align-items: center; width: 100%; gap: 16px; justify-content: flex-start;} 
         .reserve-row .player-select { font-size: 24px; width: 140px; text-align: left;} 
-        .reserve-row .jersey-num { font-size: 24px; width: 45px; text-align: left;} 
+        /* 🌟 預備球員的背號同步拉近一半距離 🌟 */
+        .reserve-row .jersey-num { font-size: 24px; width: 45px; text-align: left; margin-left: -8px;} 
         .reserve-row .order-num { font-size: 24px; color: #888; width: 30px; text-align: center; text-shadow: none;}
 
         .btn-group { display: flex; gap: 12px; margin-top: 8px;}
