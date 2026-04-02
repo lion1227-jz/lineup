@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - STARTING LINEUP V22</title>
+    <title>JZ BASEBALL TEAM - STARTING LINEUP V23</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -58,10 +58,9 @@
 
         .header-title { font-family: 'Oswald', sans-serif; font-size: 43px; font-style: italic; color: #fff; margin: -5px 0 5px 0; line-height: 1; letter-spacing: 2px; text-shadow: 4px 4px 0 #4A148C; }
         
-        /* 🌟 建立絕對網格比例：上方資訊欄 🌟 */
         .game-info-grid { 
             display: grid; 
-            grid-template-columns: 1.25fr 1.05fr 0.9fr; /* 調整比例讓第一欄稍微變寬，確保名字夠放 */
+            grid-template-columns: 1.25fr 1.05fr 0.9fr; 
             gap: 12px; padding-bottom: 10px; 
             border-bottom: 2px solid rgba(255,255,255,0.3); margin-bottom: 15px; 
         }
@@ -81,10 +80,9 @@
             cursor: pointer; opacity: 1;
         }
 
-        /* 🌟 建立絕對網格比例：下方名單總架構 🌟 */
         .roster-split {
             display: grid; 
-            grid-template-columns: 1.25fr 1.05fr 0.9fr; /* 完全對齊上方的比例 */
+            grid-template-columns: 1.25fr 1.05fr 0.9fr; 
             gap: 12px; flex: 1;
         }
         
@@ -93,7 +91,6 @@
 
         .lineup-list { display: flex; flex-direction: column; gap: 7px; }
         
-        /* 🌟 核心魔法：先發名單的每一行，完美繼承父元素的 1.25 : 1.05 網格 🌟 */
         .lineup-row { 
             display: grid; 
             grid-template-columns: 1.25fr 1.05fr; 
@@ -101,23 +98,25 @@
             align-items: center; 
         } 
         
-        /* 拆分先發的左右區塊 */
         .starter-left-col {
-            display: flex; align-items: center; gap: 16px; /* 這裡維持大約 1 個字元的舒適內距 */
+            display: flex; align-items: center; gap: 16px; 
         }
         
         .starter-right-col {
             display: flex; align-items: center;
-            padding-left: 2px; /* 微調 2px，讓背號完美貼齊那條 2px 的邊線 */
+            padding-left: 2px; 
         }
 
+        /* 🌟 核心修正：強制鎖定寬度，確保 1~9 與 SP 佔據絕對相同空間 🌟 */
         .order-num { 
             font-family: 'Oswald', sans-serif; font-size: 24px; font-style: italic; color: #fff; 
-            width: 30px; text-align: center; text-shadow: 2px 2px 0 #673AB7; 
+            width: 38px; min-width: 38px; flex-shrink: 0; /* 絕對鎖死寬度 */
+            text-align: center; text-shadow: 2px 2px 0 #673AB7; 
         }
         
         .sp-num { 
-            color: #B388FF; font-size: 24px; width: 30px; text-align: center;
+            color: #B388FF; font-size: 24px; 
+            /* 不再設定寬度，交由 .order-num 的 38px 統一管理 */
         }
 
         .pos-box { 
@@ -133,7 +132,7 @@
         .player-select { 
             appearance: none; background: transparent; border: none; 
             color: #fff; font-size: 24px; font-weight: bold; cursor: pointer; outline: none; 
-            width: 100%; /* 自動填滿第一欄 */
+            width: 100%; 
             text-shadow: 2px 2px 4px #000;
         }
         .player-select option { color: #000; background: #fff; }
@@ -145,7 +144,7 @@
             opacity: 0; transition: 0.3s; 
             width: 45px; 
             text-align: left;
-            margin-left: 0; /* 歸零！交給強大的 CSS Grid 網格去對齊 */
+            margin-left: 0; 
         }
         .jersey-num.active { opacity: 1; }
 
@@ -155,7 +154,6 @@
         
         .reserves-list { display: flex; flex-direction: column; gap: 7px; }
         
-        /* 預備球員維持彈性排版 */
         .reserve-row { display: flex; align-items: center; width: 100%; gap: 12px; justify-content: flex-start;} 
         .reserve-row .player-select { font-size: 24px; width: 110px; text-align: left;} 
         .reserve-row .jersey-num { font-size: 24px; width: 35px; text-align: left;} 
@@ -202,7 +200,7 @@
                                 <select class="pos-select-hidden" disabled><option value="P">P</option></select>
                                 <div class="pos-box"><span>P</span></div>
                             </div>
-                            <select class="player-select"><option value="">-- 先發投手 --</option></select>
+                            <select class="player-select"><option value="">-- 球員 --</option></select>
                         </div>
                         <div class="starter-right-col">
                             <div class="jersey-num"></div>
@@ -253,7 +251,6 @@
         const row = document.createElement('div');
         row.className = type === 'reserve' ? 'reserve-row' : 'lineup-row';
         
-        /* 🌟 JS 動態渲染套用拆分架構 🌟 */
         if (type === 'starter') {
             let numHtml = `<div class="order-num">${index}</div>
                 <div style="position:relative;">
