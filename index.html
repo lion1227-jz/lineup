@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - STARTING LINEUP V9</title>
+    <title>JZ BASEBALL TEAM - STARTING LINEUP V10</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -24,12 +24,11 @@
             display: flex; flex-direction: column; 
         }
 
-        /* 🌟 修正重點：載入雲端硬碟直連圖，並將對齊點設為靠右貼底 🌟 */
         .right-panel { 
             width: 40%; 
             background-image: url('https://lh3.googleusercontent.com/d/1UfvVaUAMRQ3EXtYLQQjOvvFGv8zmk0PN'); 
             background-size: cover; 
-            background-position: right bottom; /* 讓右側的球員完整顯示，不再只剩頭 */
+            background-position: right bottom; 
             background-repeat: no-repeat;
             position: relative;
         }
@@ -62,8 +61,9 @@
             padding-left: 10px;
         }
         
+        /* 🌟 將原本的亮藍色換成 Logo 黃金色 (#FFD700) 🌟 */
         .game-info-grid input, .game-info-grid select { 
-            background: transparent; border: none; color: #00d4ff; font-size: 16px; font-weight: bold; outline: none; cursor: pointer; width: 100%;
+            background: transparent; border: none; color: #FFD700; font-size: 16px; font-weight: bold; outline: none; cursor: pointer; width: 100%;
         }
 
         input[type="date"]::-webkit-calendar-picker-indicator,
@@ -85,7 +85,8 @@
         .order-num { font-family: 'Oswald', sans-serif; font-size: 24px; font-style: italic; color: #fff; width: 30px; text-align: right; text-shadow: 2px 2px 0 #673AB7; }
         .sp-num { color: #B388FF; font-size: 20px;}
 
-        .pos-box { background: #4A148C; color: #fff; font-family: 'Oswald', sans-serif; font-size: 16px; width: 38px; height: 26px; display: flex; justify-content: center; align-items: center; transform: skewX(-10deg); border-left: 3px solid #00d4ff; }
+        /* 🌟 守位方塊的左側裝飾線也換成黃金色 🌟 */
+        .pos-box { background: #4A148C; color: #fff; font-family: 'Oswald', sans-serif; font-size: 16px; width: 38px; height: 26px; display: flex; justify-content: center; align-items: center; transform: skewX(-10deg); border-left: 3px solid #FFD700; }
         .pos-box span { transform: skewX(10deg); }
         .pos-select-hidden { position: absolute; opacity: 0; width: 38px; height: 26px; cursor: pointer; z-index: 5; }
 
@@ -100,7 +101,9 @@
         .jersey-num.active { opacity: 1; }
 
         .reserves-section { background: rgba(0,0,0,0.3); padding: 10px 10px; border-radius: 8px; border-left: 2px solid rgba(255,255,255,0.2); height: 100%; box-sizing: border-box; }
-        .reserves-title { color: #00d4ff; font-size: 14px; margin-bottom: 8px; font-weight: bold; letter-spacing: 2px; border-left: 3px solid #00d4ff; padding-left: 8px; }
+        
+        /* 🌟 預備球員標題與左側裝飾線換成黃金色 🌟 */
+        .reserves-title { color: #FFD700; font-size: 14px; margin-bottom: 8px; font-weight: bold; letter-spacing: 2px; border-left: 3px solid #FFD700; padding-left: 8px; }
         
         .reserves-list { display: flex; flex-direction: column; gap: 7px; }
         .reserve-row { display: flex; align-items: center; width: 100%; gap: 6px;}
@@ -173,7 +176,7 @@
 </div>
 
 <script>
-    /* 注入你的 JZ Logo (為了確保載入順利，用 JS 載入) */
+    /* 載入你的 JZ Logo */
     document.getElementById('dynamic-logo').src = "https://lh3.googleusercontent.com/d/1aooCsOuMMtwMhT5bay4kDQCAq9sbm3kW";
     document.getElementById('game-date').value = new Date().toISOString().split('T')[0];
 
