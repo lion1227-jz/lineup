@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - STARTING LINEUP V18</title>
+    <title>JZ BASEBALL TEAM - STARTING LINEUP V19</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -58,8 +58,9 @@
 
         .header-title { font-family: 'Oswald', sans-serif; font-size: 43px; font-style: italic; color: #fff; margin: -5px 0 5px 0; line-height: 1; letter-spacing: 2px; text-shadow: 4px 4px 0 #4A148C; }
         
+        /* 🌟 優化：稍微調整欄位比例，給先發名單更多空間來做等距展開 🌟 */
         .game-info-grid { 
-            display: grid; grid-template-columns: 1fr 1fr 1.25fr; 
+            display: grid; grid-template-columns: 1.1fr 1.1fr 1fr; 
             gap: 12px; padding-bottom: 10px; 
             border-bottom: 2px solid rgba(255,255,255,0.3); margin-bottom: 15px; 
         }
@@ -79,8 +80,9 @@
             cursor: pointer; opacity: 1;
         }
 
+        /* 🌟 同步調整底部名單區塊的欄位比例 🌟 */
         .roster-split {
-            display: grid; grid-template-columns: 1fr 1fr 1.25fr; gap: 12px; flex: 1;
+            display: grid; grid-template-columns: 1.1fr 1.1fr 1fr; gap: 12px; flex: 1;
         }
         
         .starters-col { grid-column: 1 / span 2; display: flex; flex-direction: column; }
@@ -88,16 +90,20 @@
 
         .lineup-list { display: flex; flex-direction: column; gap: 7px; }
         
-        .lineup-row { display: flex; align-items: center; gap: 2px; } 
+        /* 🌟 終極等距魔法：所有元素強制平均分隔，每個間距約 3 個字元 (50px) 🌟 */
+        .lineup-row { 
+            display: flex; align-items: center; 
+            gap: 50px; /* 這裡控制了平均分隔的寬度 */
+        } 
         
+        /* 移除了個別的 margin，讓 gap 統一控制 */
         .order-num { 
             font-family: 'Oswald', sans-serif; font-size: 24px; font-style: italic; color: #fff; 
             width: 30px; text-align: center; text-shadow: 2px 2px 0 #673AB7; 
-            margin-right: 25px; 
         }
         
         .sp-num { 
-            color: #B388FF; font-size: 24px; 
+            color: #B388FF; font-size: 24px; width: 30px; text-align: center;
         }
 
         .pos-box { 
@@ -110,16 +116,14 @@
         .pos-box span { transform: skewX(10deg); }
         .pos-select-hidden { position: absolute; opacity: 0; width: 50px; height: 34px; cursor: pointer; z-index: 5; }
 
-        /* 🌟 優化：將選單稍微放寬，配合右側 Margin 營造 3 字元空間 🌟 */
         .player-select { 
             appearance: none; background: transparent; border: none; 
             color: #fff; font-size: 24px; font-weight: bold; cursor: pointer; outline: none; 
-            width: 140px; /* 從 115px 調整至 140px */
+            width: 140px; 
             text-shadow: 2px 2px 4px #000;
         }
         .player-select option { color: #000; background: #fff; }
 
-        /* 🌟 優化：加入 20px 的左側推擠，視覺上剛好約 3 個字元 🌟 */
         .jersey-num { 
             font-family: 'Oswald', sans-serif; 
             font-size: 24px; 
@@ -127,7 +131,6 @@
             opacity: 0; transition: 0.3s; 
             width: 45px; 
             text-align: left;
-            margin-left: 20px; /* 🌟 產生舒適的呼吸空間 🌟 */
         }
         .jersey-num.active { opacity: 1; }
 
@@ -137,11 +140,11 @@
         
         .reserves-list { display: flex; flex-direction: column; gap: 7px; }
         
-        /* 預備球員區同步調整距離 */
-        .reserve-row { display: flex; align-items: center; width: 100%; gap: 2px;} 
-        .reserve-row .player-select { font-size: 24px; width: 140px; } 
-        .reserve-row .jersey-num { font-size: 24px; width: 45px; margin-left: 20px;} 
-        .reserve-row .order-num { font-size: 24px; color: #888; width: 30px; text-align: center; text-shadow: none; margin-right: 20px;}
+        /* 預備球員區自動化平均分配，不受影響 */
+        .reserve-row { display: flex; align-items: center; width: 100%; justify-content: space-between;} 
+        .reserve-row .player-select { font-size: 24px; width: 120px; text-align: center;} 
+        .reserve-row .jersey-num { font-size: 24px; width: 35px; text-align: right;} 
+        .reserve-row .order-num { font-size: 24px; color: #888; width: 25px; text-align: left; text-shadow: none;}
 
         .btn-group { display: flex; gap: 12px; margin-top: 8px;}
         button { font-size: 16px; padding: 10px 20px; font-weight: bold; color: #fff; border: none; border-radius: 8px; cursor: pointer; background: #4A148C; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
