@@ -237,4 +237,84 @@
             const p = playersData.find(x => x.name === pSelect.value);
             if (p && p.num) {
                 jerseyNum.textContent = '#' + p.num;
-                jerseyNum.classList.
+                jerseyNum.classList.add('active');
+            } else {
+                jerseyNum.textContent = '';
+                jerseyNum.classList.remove('active');
+            }
+            validateForm();
+        });
+
+        if (type === 'starter') {
+            posHidden.innerHTML = '<option value="">位</option>' + posList.map(pos => `<option value="${pos}">${pos}</option>`).join('');
+        }
+
+        container.appendChild(row);
+    }
+
+    function setupPitcherJersey() {
+        const pRow = document.getElementById('sp-row');
+        const pSelect = pRow.querySelector('.player-select');
+        const jerseyNum = pRow.querySelector('.jersey-num');
+
+        pSelect.addEventListener('change', () => {
+            const p = playersData.find(x => x.name === pSelect.value);
+            if (p && p.num) {
+                jerseyNum.textContent = '#' + p.num;
+                jerseyNum.classList.add('active');
+            } else {
+                jerseyNum.textContent = '';
+                jerseyNum.classList.remove('active');
+            }
+            validateForm();
+        });
+    }
+
+    for (let i = 1; i <= 9; i++) createRow(i, 'starter', document.getElementById('starters-board'));
+    setupPitcherJersey();
+    for (let i = 1; i <= 8; i++) createRow(i, 'reserve', document.getElementById('reserves-board'));
+
+    Papa.parse(GOOGLE_SHEET_URL, {
+        download: true,
+        header: false,
+        complete: function(results) {
+            const data = results.data.slice(1);
+            playersData = data.map(row => ({ 
+                num: String(row[0]||"").trim(), 
+                name: String(row[1]||"").trim() 
+            })).filter(p => p.name !== "");
+            
+            const locations = Array.from(new Set(data.map(row => String(row[2]||"").trim()))).filter(loc => loc !== "");
+
+            document.getElementById('game-location').innerHTML = '<option value="">選擇球場...</option>' + locations.map(loc => `<option value="${loc}">${loc}</option>`).join('');
+            
+            document.querySelectorAll('.player-select').forEach(select => {
+                playersData.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.name; opt.textContent = p.name;
+                    select.appendChild(opt);
+                });
+            });
+        }
+    });
+
+    async function handleShare() {
+        const btnGroup = document.querySelector('.btn-group');
+        btnGroup.style.opacity = '0'; 
+        await new Promise(r => setTimeout(r, 100));
+        
+        const canvas = await html2canvas(document.getElementById('capture-area'), { scale: 2, useCORS: true, backgroundColor: null });
+        btnGroup.style.opacity = '1'; 
+
+        canvas.toBlob(async (blob) => {
+            const file = new File([blob], 'JZ_StartingLineup.png', { type: 'image/png' });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file] });
+            else { const link = document.createElement('a'); link.download = 'JZ_StartingLineup.png'; link.href = URL.createObjectURL(blob); link.click(); }
+        });
+    }
+
+    document.getElementById('export-btn').onclick = handleShare;
+    document.getElementById('share-line-btn').onclick = handleShare;
+</script>
+</body>
+</html>
