@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - STARTING LINEUP V19</title>
+    <title>JZ BASEBALL TEAM - STARTING LINEUP V20</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -58,7 +58,6 @@
 
         .header-title { font-family: 'Oswald', sans-serif; font-size: 43px; font-style: italic; color: #fff; margin: -5px 0 5px 0; line-height: 1; letter-spacing: 2px; text-shadow: 4px 4px 0 #4A148C; }
         
-        /* 🌟 優化：稍微調整欄位比例，給先發名單更多空間來做等距展開 🌟 */
         .game-info-grid { 
             display: grid; grid-template-columns: 1.1fr 1.1fr 1fr; 
             gap: 12px; padding-bottom: 10px; 
@@ -80,7 +79,6 @@
             cursor: pointer; opacity: 1;
         }
 
-        /* 🌟 同步調整底部名單區塊的欄位比例 🌟 */
         .roster-split {
             display: grid; grid-template-columns: 1.1fr 1.1fr 1fr; gap: 12px; flex: 1;
         }
@@ -90,13 +88,12 @@
 
         .lineup-list { display: flex; flex-direction: column; gap: 7px; }
         
-        /* 🌟 終極等距魔法：所有元素強制平均分隔，每個間距約 3 個字元 (50px) 🌟 */
+        /* 🌟 優化：將間距縮小到 16px (大約 1 個字元寬度) 🌟 */
         .lineup-row { 
             display: flex; align-items: center; 
-            gap: 50px; /* 這裡控制了平均分隔的寬度 */
+            gap: 16px; 
         } 
         
-        /* 移除了個別的 margin，讓 gap 統一控制 */
         .order-num { 
             font-family: 'Oswald', sans-serif; font-size: 24px; font-style: italic; color: #fff; 
             width: 30px; text-align: center; text-shadow: 2px 2px 0 #673AB7; 
@@ -140,11 +137,11 @@
         
         .reserves-list { display: flex; flex-direction: column; gap: 7px; }
         
-        /* 預備球員區自動化平均分配，不受影響 */
-        .reserve-row { display: flex; align-items: center; width: 100%; justify-content: space-between;} 
-        .reserve-row .player-select { font-size: 24px; width: 120px; text-align: center;} 
-        .reserve-row .jersey-num { font-size: 24px; width: 35px; text-align: right;} 
-        .reserve-row .order-num { font-size: 24px; color: #888; width: 25px; text-align: left; text-shadow: none;}
+        /* 🌟 預備球員區同步套用 16px 的等距間隔 🌟 */
+        .reserve-row { display: flex; align-items: center; width: 100%; gap: 16px; justify-content: flex-start;} 
+        .reserve-row .player-select { font-size: 24px; width: 140px; text-align: left;} 
+        .reserve-row .jersey-num { font-size: 24px; width: 45px; text-align: left;} 
+        .reserve-row .order-num { font-size: 24px; color: #888; width: 30px; text-align: center; text-shadow: none;}
 
         .btn-group { display: flex; gap: 12px; margin-top: 8px;}
         button { font-size: 16px; padding: 10px 20px; font-weight: bold; color: #fff; border: none; border-radius: 8px; cursor: pointer; background: #4A148C; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
