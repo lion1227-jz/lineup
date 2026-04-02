@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - STARTING LINEUP V24</title>
+    <title>JZ BASEBALL TEAM - STARTING LINEUP V25</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -127,15 +127,16 @@
         .pos-box span { transform: skewX(10deg); }
         .pos-select-hidden { position: absolute; opacity: 0; width: 50px; height: 34px; cursor: pointer; z-index: 5; }
 
-        /* 🌟 核心修正：加入內距與行高，釋放文字邊界空間，防止裁切 🌟 */
+        /* 🌟 核心修正：加入超大右側內距 (20px) 與溢出設定，徹底消滅右側裁切問題 🌟 */
         .player-select { 
-            -webkit-appearance: none; -moz-appearance: none; appearance: none; /* 徹底抹除瀏覽器預設樣式 */
+            -webkit-appearance: none; -moz-appearance: none; appearance: none; 
             background: transparent; border: none; 
             color: #fff; font-size: 24px; font-weight: bold; cursor: pointer; outline: none; 
             width: 100%; 
             text-shadow: 2px 2px 4px #000;
-            padding: 4px 8px 4px 2px; /* 增加上方 4px、右側 8px 的呼吸空間 */
-            line-height: 1.3; /* 強制垂直撐開 */
+            padding: 4px 20px 4px 2px; /* 🌟 加上 20px 的右側防護罩 🌟 */
+            line-height: 1.3; 
+            overflow: visible;
         }
         .player-select option { color: #000; background: #fff; }
 
@@ -157,7 +158,8 @@
         .reserves-list { display: flex; flex-direction: column; gap: 7px; }
         
         .reserve-row { display: flex; align-items: center; width: 100%; gap: 12px; justify-content: flex-start;} 
-        .reserve-row .player-select { font-size: 24px; width: 110px; text-align: left;} 
+        /* 🌟 預備球員也稍微放寬，確保加上 Padding 後依然裝得下 🌟 */
+        .reserve-row .player-select { font-size: 24px; width: 125px; text-align: left;} 
         .reserve-row .jersey-num { font-size: 24px; width: 35px; text-align: left;} 
         .reserve-row .order-num { font-size: 24px; color: #888; width: 25px; text-align: center; text-shadow: none;}
 
@@ -171,203 +173,4 @@
 
 <div id="capture-area">
     <div class="left-panel">
-        <img class="watermark-logo" src="https://lh3.googleusercontent.com/d/1aooCsOuMMtwMhT5bay4kDQCAq9sbm3kW" crossorigin="anonymous" alt="Watermark">
-
-        <h1 class="header-title">STARTING LINEUP</h1>
-        
-        <div class="game-info-grid">
-            <div class="info-cell"><input type="date" id="game-date"></div>
-            <div class="info-cell"><input type="time" value="08:00" title="集合時間"></div>
-            <div class="info-cell"><input type="time" value="09:00" title="比賽時間"></div>
-            <div class="info-cell"><select id="game-location"><option value="">選擇球場...</option></select></div>
-            <div class="info-cell">
-                <select id="bench-side">
-                    <option value="">休息區</option>
-                    <option value="一壘側">一壘側</option>
-                    <option value="三壘側">三壘側</option>
-                </select>
-            </div>
-            <div class="info-cell"><input type="text" placeholder="輸入對手名稱..." style="width:100%;"></div>
-        </div>
-
-        <div class="roster-split">
-            <div class="starters-col">
-                <div class="lineup-list" id="starters-board"></div>
-                
-                <div class="lineup-list" style="margin-top: 7px;">
-                    <div class="lineup-row" id="sp-row">
-                        <div class="starter-left-col">
-                            <div class="order-num sp-num">SP</div>
-                            <div style="position:relative;">
-                                <select class="pos-select-hidden" disabled><option value="P">P</option></select>
-                                <div class="pos-box"><span>P</span></div>
-                            </div>
-                            <select class="player-select"><option value="">-- 球員 --</option></select>
-                        </div>
-                        <div class="starter-right-col">
-                            <div class="jersey-num"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="btn-group">
-                    <button id="export-btn">📸 下載圖檔</button>
-                    <button id="share-line-btn">🟢 分享至 LINE</button>
-                </div>
-            </div>
-
-            <div class="bench-col">
-                <div class="reserves-section">
-                    <div class="reserves-title">預備球員</div>
-                    <div class="reserves-list" id="reserves-board"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="right-panel">
-        <div class="vertical-text">Jz Baseball Team</div>
-    </div>
-</div>
-
-<script>
-    document.getElementById('game-date').value = new Date().toISOString().split('T')[0];
-
-    const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQE8qU7MUo8mltMrnQSLttK1ePGuN2ooTaD3QBtoKsmvrW5tEKOjSXwGm9bwhZtgy2veLF-QLTpe33q/pub?output=csv";
-    let playersData = [];
-    const posList = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH"];
-
-    function validateForm() {
-        const pSelects = Array.from(document.querySelectorAll('.player-select'));
-        const pValues = pSelects.map(s => s.value).filter(v => v !== "");
-        pSelects.forEach(select => {
-            if (select.value === "") select.style.color = "#fff";
-            else {
-                const count = pValues.filter(v => v === select.value).length;
-                select.style.color = count > 1 ? "#FF3B30" : "#fff";
-            }
-        });
-    }
-
-    function createRow(index, type, container) {
-        const row = document.createElement('div');
-        row.className = type === 'reserve' ? 'reserve-row' : 'lineup-row';
-        
-        if (type === 'starter') {
-            let numHtml = `<div class="order-num">${index}</div>
-                <div style="position:relative;">
-                    <select class="pos-select-hidden"></select>
-                    <div class="pos-box"><span>-</span></div>
-                </div>`;
-                
-            row.innerHTML = `
-                <div class="starter-left-col">
-                    ${numHtml}
-                    <select class="player-select"><option value="">-- 球員 --</option></select>
-                </div>
-                <div class="starter-right-col">
-                    <div class="jersey-num"></div>
-                </div>
-            `;
-        } else if (type === 'reserve') {
-            row.innerHTML = `
-                <div class="order-num">${index}</div>
-                <select class="player-select"><option value="">-- 球員 --</option></select>
-                <div class="jersey-num"></div>
-            `;
-        }
-
-        const pSelect = row.querySelector('.player-select');
-        const posHidden = row.querySelector('.pos-select-hidden');
-        const posText = row.querySelector('.pos-box span');
-        const jerseyNum = row.querySelector('.jersey-num');
-
-        if (type === 'starter') {
-            posHidden.addEventListener('change', (e) => { posText.textContent = e.target.value || '-'; });
-        }
-        
-        pSelect.addEventListener('change', () => {
-            const p = playersData.find(x => x.name === pSelect.value);
-            if (p && p.num) {
-                jerseyNum.textContent = '#' + p.num;
-                jerseyNum.classList.add('active');
-            } else {
-                jerseyNum.textContent = '';
-                jerseyNum.classList.remove('active');
-            }
-            validateForm();
-        });
-
-        if (type === 'starter') {
-            posHidden.innerHTML = '<option value="">位</option>' + posList.map(pos => `<option value="${pos}">${pos}</option>`).join('');
-        }
-
-        container.appendChild(row);
-    }
-
-    function setupPitcherJersey() {
-        const pRow = document.getElementById('sp-row');
-        const pSelect = pRow.querySelector('.player-select');
-        const jerseyNum = pRow.querySelector('.jersey-num');
-
-        pSelect.addEventListener('change', () => {
-            const p = playersData.find(x => x.name === pSelect.value);
-            if (p && p.num) {
-                jerseyNum.textContent = '#' + p.num;
-                jerseyNum.classList.add('active');
-            } else {
-                jerseyNum.textContent = '';
-                jerseyNum.classList.remove('active');
-            }
-            validateForm();
-        });
-    }
-
-    for (let i = 1; i <= 9; i++) createRow(i, 'starter', document.getElementById('starters-board'));
-    setupPitcherJersey();
-    for (let i = 1; i <= 8; i++) createRow(i, 'reserve', document.getElementById('reserves-board'));
-
-    Papa.parse(GOOGLE_SHEET_URL, {
-        download: true,
-        header: false,
-        complete: function(results) {
-            const data = results.data.slice(1);
-            playersData = data.map(row => ({ 
-                num: String(row[0]||"").trim(), 
-                name: String(row[1]||"").trim() 
-            })).filter(p => p.name !== "");
-            
-            const locations = Array.from(new Set(data.map(row => String(row[2]||"").trim()))).filter(loc => loc !== "");
-
-            document.getElementById('game-location').innerHTML = '<option value="">選擇球場...</option>' + locations.map(loc => `<option value="${loc}">${loc}</option>`).join('');
-            
-            document.querySelectorAll('.player-select').forEach(select => {
-                playersData.forEach(p => {
-                    const opt = document.createElement('option');
-                    opt.value = p.name; opt.textContent = p.name;
-                    select.appendChild(opt);
-                });
-            });
-        }
-    });
-
-    async function handleShare() {
-        const btnGroup = document.querySelector('.btn-group');
-        btnGroup.style.opacity = '0'; 
-        await new Promise(r => setTimeout(r, 100));
-        
-        const canvas = await html2canvas(document.getElementById('capture-area'), { scale: 2, useCORS: true, backgroundColor: null });
-        btnGroup.style.opacity = '1'; 
-
-        canvas.toBlob(async (blob) => {
-            const file = new File([blob], 'JZ_StartingLineup.png', { type: 'image/png' });
-            if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file] });
-            else { const link = document.createElement('a'); link.download = 'JZ_StartingLineup.png'; link.href = URL.createObjectURL(blob); link.click(); }
-        });
-    }
-
-    document.getElementById('export-btn').onclick = handleShare;
-    document.getElementById('share-line-btn').onclick = handleShare;
-</script>
-</body>
-</html>
+        <img
