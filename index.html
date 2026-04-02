@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - STARTING LINEUP V15</title>
+    <title>JZ BASEBALL TEAM - STARTING LINEUP V18</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -90,47 +90,44 @@
         
         .lineup-row { display: flex; align-items: center; gap: 2px; } 
         
-        /* 🌟 優化 1：棒次與守備位置拉開兩個字元的空間 🌟 */
         .order-num { 
             font-family: 'Oswald', sans-serif; font-size: 24px; font-style: italic; color: #fff; 
-            width: 30px; text-align: right; text-shadow: 2px 2px 0 #673AB7; 
-            margin-right: 20px; /* 增加右側推擠空間 */
+            width: 30px; text-align: center; text-shadow: 2px 2px 0 #673AB7; 
+            margin-right: 25px; 
         }
         
         .sp-num { 
-            color: #B388FF; font-size: 20px; 
-            width: 30px; text-align: right; /* 與棒次數字保持一致對齊 */
+            color: #B388FF; font-size: 24px; 
         }
 
-        /* 守備位置字體 22px */
         .pos-box { 
             background: #4A148C; color: #fff; font-family: 'Oswald', sans-serif; 
-            font-size: 22px; 
-            width: 48px; height: 32px; 
+            font-size: 24px; 
+            width: 50px; height: 34px; 
             display: flex; justify-content: center; align-items: center; 
             transform: skewX(-10deg); border-left: 3px solid #B89947; 
         }
         .pos-box span { transform: skewX(10deg); }
-        .pos-select-hidden { position: absolute; opacity: 0; width: 48px; height: 32px; cursor: pointer; z-index: 5; }
+        .pos-select-hidden { position: absolute; opacity: 0; width: 50px; height: 34px; cursor: pointer; z-index: 5; }
 
-        /* 🌟 優化 3：大幅縮減選單寬度，強迫背號往左靠攏 🌟 */
+        /* 🌟 優化：將選單稍微放寬，配合右側 Margin 營造 3 字元空間 🌟 */
         .player-select { 
             appearance: none; background: transparent; border: none; 
             color: #fff; font-size: 24px; font-weight: bold; cursor: pointer; outline: none; 
-            width: 115px; /* 從 145px 縮減到 115px，完美包覆名字 */
+            width: 140px; /* 從 115px 調整至 140px */
             text-shadow: 2px 2px 4px #000;
         }
         .player-select option { color: #000; background: #fff; }
 
-        /* 🌟 優化 2 & 3：背號字體改成跟守位一樣大(22px)，並使用負邊距再拉近 🌟 */
+        /* 🌟 優化：加入 20px 的左側推擠，視覺上剛好約 3 個字元 🌟 */
         .jersey-num { 
             font-family: 'Oswald', sans-serif; 
-            font-size: 22px; /* 🌟 降回 22px，與守備位置一樣大 🌟 */
+            font-size: 24px; 
             color: #B388FF; font-style: italic; 
             opacity: 0; transition: 0.3s; 
             width: 45px; 
             text-align: left;
-            margin-left: -5px; /* 🌟 負邊距，讓背號極致貼合名字 🌟 */
+            margin-left: 20px; /* 🌟 產生舒適的呼吸空間 🌟 */
         }
         .jersey-num.active { opacity: 1; }
 
@@ -140,11 +137,11 @@
         
         .reserves-list { display: flex; flex-direction: column; gap: 7px; }
         
+        /* 預備球員區同步調整距離 */
         .reserve-row { display: flex; align-items: center; width: 100%; gap: 2px;} 
-        .reserve-row .player-select { font-size: 24px; width: 115px; } /* 同步收窄 */
-        .reserve-row .jersey-num { font-size: 22px; width: 45px; margin-left: -5px;} /* 同步拉近與調整字體 */
-        
-        .reserve-row .order-num { font-size: 24px; color: #888; width: 30px; text-align: right; text-shadow: none; margin-right: 15px;}
+        .reserve-row .player-select { font-size: 24px; width: 140px; } 
+        .reserve-row .jersey-num { font-size: 24px; width: 45px; margin-left: 20px;} 
+        .reserve-row .order-num { font-size: 24px; color: #888; width: 30px; text-align: center; text-shadow: none; margin-right: 20px;}
 
         .btn-group { display: flex; gap: 12px; margin-top: 8px;}
         button { font-size: 16px; padding: 10px 20px; font-weight: bold; color: #fff; border: none; border-radius: 8px; cursor: pointer; background: #4A148C; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
@@ -273,4 +270,75 @@
         });
 
         if (type === 'starter') {
-            posHidden.innerHTML = '<option value="">位</option>' + posList.map(pos => `<option value="${pos}">${pos}</option
+            posHidden.innerHTML = '<option value="">位</option>' + posList.map(pos => `<option value="${pos}">${pos}</option>`).join('');
+        }
+
+        container.appendChild(row);
+    }
+
+    function setupPitcherJersey() {
+        const pRow = document.getElementById('sp-row');
+        const pSelect = pRow.querySelector('.player-select');
+        const jerseyNum = pRow.querySelector('.jersey-num');
+
+        pSelect.addEventListener('change', () => {
+            const p = playersData.find(x => x.name === pSelect.value);
+            if (p && p.num) {
+                jerseyNum.textContent = '#' + p.num;
+                jerseyNum.classList.add('active');
+            } else {
+                jerseyNum.textContent = '';
+                jerseyNum.classList.remove('active');
+            }
+            validateForm();
+        });
+    }
+
+    for (let i = 1; i <= 9; i++) createRow(i, 'starter', document.getElementById('starters-board'));
+    setupPitcherJersey();
+    for (let i = 1; i <= 8; i++) createRow(i, 'reserve', document.getElementById('reserves-board'));
+
+    Papa.parse(GOOGLE_SHEET_URL, {
+        download: true,
+        header: false,
+        complete: function(results) {
+            const data = results.data.slice(1);
+            playersData = data.map(row => ({ 
+                num: String(row[0]||"").trim(), 
+                name: String(row[1]||"").trim() 
+            })).filter(p => p.name !== "");
+            
+            const locations = Array.from(new Set(data.map(row => String(row[2]||"").trim()))).filter(loc => loc !== "");
+
+            document.getElementById('game-location').innerHTML = '<option value="">選擇球場...</option>' + locations.map(loc => `<option value="${loc}">${loc}</option>`).join('');
+            
+            document.querySelectorAll('.player-select').forEach(select => {
+                playersData.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.name; opt.textContent = p.name;
+                    select.appendChild(opt);
+                });
+            });
+        }
+    });
+
+    async function handleShare() {
+        const btnGroup = document.querySelector('.btn-group');
+        btnGroup.style.opacity = '0'; 
+        await new Promise(r => setTimeout(r, 100));
+        
+        const canvas = await html2canvas(document.getElementById('capture-area'), { scale: 2, useCORS: true, backgroundColor: null });
+        btnGroup.style.opacity = '1'; 
+
+        canvas.toBlob(async (blob) => {
+            const file = new File([blob], 'JZ_StartingLineup.png', { type: 'image/png' });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file] });
+            else { const link = document.createElement('a'); link.download = 'JZ_StartingLineup.png'; link.href = URL.createObjectURL(blob); link.click(); }
+        });
+    }
+
+    document.getElementById('export-btn').onclick = handleShare;
+    document.getElementById('share-line-btn').onclick = handleShare;
+</script>
+</body>
+</html>
