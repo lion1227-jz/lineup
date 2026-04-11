@@ -212,5 +212,191 @@
 
         <div class="roster-split">
             <div class="starters-col">
-                <div class="lineup-list" id="starters-board
- 
+                <div class="lineup-list" id="starters-board"></div>
+                
+                <div class="lineup-list" style="margin-top: 7px;">
+                    <div class="lineup-row" id="sp-row">
+                        <div class="starter-left-col">
+                            <div class="order-num sp-num">SP</div>
+                            <div style="position:relative;">
+                                <select class="pos-select-hidden" disabled><option value="P">P</option></select>
+                                <div class="pos-box"><span>P</span></div>
+                            </div>
+                            <div class="pos-num-text">1</div>
+                            <select class="player-select"><option value="">-- 球員 --</option></select>
+                        </div>
+                        <div class="starter-right-col">
+                            <div class="jersey-num"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button id="export-btn">📸 下載圖檔</button>
+                    <button id="share-line-btn">🟢 分享至 LINE</button>
+                </div>
+            </div>
+
+            <div class="bench-col">
+                <div class="reserves-section">
+                    <div class="reserves-title">預備球員</div>
+                    <div class="reserves-list" id="reserves-board"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="right-panel">
+        <div class="vertical-text">Jz Baseball Team</div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('game-date').value = new Date().toISOString().split('T')[0];
+
+    const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQE8qU7MUo8mltMrnQSLttK1ePGuN2ooTaD3QBtoKsmvrW5tEKOjSXwGm9bwhZtgy2veLF-QLTpe33q/pub?output=csv";
+    let playersData = [];
+    const posList = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH"];
+    
+    const posNumMap = { "P": "1", "C": "2", "1B": "3", "2B": "4", "3B": "5", "SS": "6", "LF": "7", "CF": "8", "RF": "9", "DH": "" };
+
+    function validateForm() {
+        const pSelects = Array.from(document.querySelectorAll('.player-select'));
+        const pValues = pSelects.map(s => s.value).filter(v => v !== "");
+        pSelects.forEach(select => {
+            if (select.value === "") select.style.color = "#fff";
+            else {
+                const count = pValues.filter(v => v === select.value).length;
+                select.style.color = count > 1 ? "#FF3B30" : "#fff";
+            }
+        });
+    }
+
+    function createRow(index, type, container) {
+        const row = document.createElement('div');
+        row.className = type === 'reserve' ? 'reserve-row' : 'lineup-row';
+        
+        if (type === 'starter') {
+            let numHtml = `<div class="order-num">${index}</div>
+                <div style="position:relative;">
+                    <select class="pos-select-hidden"></select>
+                    <div class="pos-box"><span>-</span></div>
+                </div>`;
+                
+            row.innerHTML = `
+                <div class="starter-left-col">
+                    ${numHtml}
+                    <div class="pos-num-text"></div>
+                    <select class="player-select"><option value="">-- 球員 --</option></select>
+                </div>
+                <div class="starter-right-col">
+                    <div class="jersey-num"></div>
+                </div>
+            `;
+        } else if (type === 'reserve') {
+            row.innerHTML = `
+                <div class="order-num">${index}</div>
+                <select class="player-select"><option value="">-- 球員 --</option></select>
+                <div class="jersey-num"></div>
+            `;
+        }
+
+        const pSelect = row.querySelector('.player-select');
+        const posHidden = row.querySelector('.pos-select-hidden');
+        const posText = row.querySelector('.pos-box span');
+        const jerseyNum = row.querySelector('.jersey-num');
+
+        if (type === 'starter') {
+            const posNumText = row.querySelector('.pos-num-text');
+            posHidden.addEventListener('change', (e) => { 
+                const val = e.target.value;
+                posText.textContent = val || '-'; 
+                posNumText.textContent = posNumMap[val] || ''; 
+            });
+        }
+        
+        pSelect.addEventListener('change', () => {
+            const p = playersData.find(x => x.name === pSelect.value);
+            if (p && p.num) {
+                jerseyNum.textContent = '#' + p.num;
+                jerseyNum.classList.add('active');
+            } else {
+                jerseyNum.textContent = '';
+                jerseyNum.classList.remove('active');
+            }
+            validateForm();
+        });
+
+        if (type === 'starter') {
+            posHidden.innerHTML = '<option value="">位</option>' + posList.map(pos => `<option value="${pos}">${pos}</option>`).join('');
+        }
+
+        container.appendChild(row);
+    }
+
+    function setupPitcherJersey() {
+        const pRow = document.getElementById('sp-row');
+        const pSelect = pRow.querySelector('.player-select');
+        const jerseyNum = pRow.querySelector('.jersey-num');
+
+        pSelect.addEventListener('change', () => {
+            const p = playersData.find(x => x.name === pSelect.value);
+            if (p && p.num) {
+                jerseyNum.textContent = '#' + p.num;
+                jerseyNum.classList.add('active');
+            } else {
+                jerseyNum.textContent = '';
+                jerseyNum.classList.remove('active');
+            }
+            validateForm();
+        });
+    }
+
+    for (let i = 1; i <= 9; i++) createRow(i, 'starter', document.getElementById('starters-board'));
+    setupPitcherJersey();
+    for (let i = 1; i <= 8; i++) createRow(i, 'reserve', document.getElementById('reserves-board'));
+
+    Papa.parse(GOOGLE_SHEET_URL, {
+        download: true,
+        header: false,
+        complete: function(results) {
+            const data = results.data.slice(1);
+            playersData = data.map(row => ({ 
+                num: String(row[0]||"").trim(), 
+                name: String(row[1]||"").trim() 
+            })).filter(p => p.name !== "");
+            
+            const locations = Array.from(new Set(data.map(row => String(row[2]||"").trim()))).filter(loc => loc !== "");
+
+            document.getElementById('game-location').innerHTML = '<option value="">選擇球場...</option>' + locations.map(loc => `<option value="${loc}">${loc}</option>`).join('');
+            
+            document.querySelectorAll('.player-select').forEach(select => {
+                playersData.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.name; opt.textContent = p.name;
+                    select.appendChild(opt);
+                });
+            });
+        }
+    });
+
+    async function handleShare() {
+        const btnGroup = document.querySelector('.btn-group');
+        btnGroup.style.opacity = '0'; 
+        await new Promise(r => setTimeout(r, 100));
+        
+        const canvas = await html2canvas(document.getElementById('capture-area'), { scale: 2, useCORS: true, backgroundColor: null });
+        btnGroup.style.opacity = '1'; 
+
+        canvas.toBlob(async (blob) => {
+            const file = new File([blob], 'JZ_StartingLineup.png', { type: 'image/png' });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file] });
+            else { const link = document.createElement('a'); link.download = 'JZ_StartingLineup.png'; link.href = URL.createObjectURL(blob); link.click(); }
+        });
+    }
+
+    document.getElementById('export-btn').onclick = handleShare;
+    document.getElementById('share-line-btn').onclick = handleShare;
+</script>
+</body>
+</html>
