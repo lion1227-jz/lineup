@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - STARTING LINEUP V30</title>
+    <title>JZ BASEBALL TEAM - STARTING LINEUP V31</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -58,7 +58,6 @@
 
         .header-title { font-family: 'Oswald', sans-serif; font-size: 43px; font-style: italic; color: #fff; margin: -5px 0 5px 0; line-height: 1; letter-spacing: 2px; text-shadow: 4px 4px 0 #4A148C; }
         
-        /* 資訊列維持 1:1:1 平均分配 */
         .game-info-grid { 
             display: grid; 
             grid-template-columns: 1fr 1fr 1fr; 
@@ -81,47 +80,35 @@
             cursor: pointer; opacity: 1;
         }
 
-        /* 🌟 重大調整：左側版圖稍微縮回，背號自動拉近。同時給預備區(1.2fr)更多空間 🌟 */
+        /* 🌟 精準切割：先發 70% / 預備 30% 🌟 */
         .roster-split {
-            display: grid; 
-            grid-template-columns: 1.6fr 0.8fr 1.2fr; 
+            display: flex; 
             gap: 12px; flex: 1;
         }
-        
-        .starters-col { grid-column: 1 / span 2; display: flex; flex-direction: column; }
-        .bench-col { grid-column: 3; display: flex; flex-direction: column; }
+        .starters-col { width: calc(70% - 6px); display: flex; flex-direction: column; }
+        .bench-col { width: calc(30% - 6px); display: flex; flex-direction: column; }
 
         .lineup-list { display: flex; flex-direction: column; gap: 7px; }
         
+        /* 🌟 線性緊湊排列：讓背號緊貼名字 🌟 */
         .lineup-row { 
-            display: grid; 
-            grid-template-columns: 1.6fr 0.8fr; 
-            gap: 12px; 
+            display: flex; 
             align-items: center; 
+            gap: 8px; 
         } 
         
-        /* 🌟 瘦身術：間距從 12px 縮為 8px 🌟 */
-        .starter-left-col {
-            display: flex; align-items: center; gap: 8px; 
-        }
-        
-        .starter-right-col {
-            display: flex; align-items: center;
-            padding-left: 2px; 
-        }
-
-        /* 🌟 瘦身術：棒次寬度縮小 🌟 */
         .order-num { 
             font-family: 'Oswald', sans-serif; font-size: 24px; font-style: italic; color: #fff; 
-            width: 30px; min-width: 30px; flex-shrink: 0; 
+            width: 28px; min-width: 28px; flex-shrink: 0; 
             text-align: center; text-shadow: 2px 2px 0 #673AB7; 
         }
         
         .sp-num { 
-            color: #B388FF; font-size: 22px; /* SP 稍微縮小以適應 30px 寬度 */
+            color: #B388FF; font-size: 22px; 
         }
 
-        /* 🌟 瘦身術：守備方塊微調寬度 🌟 */
+        .pos-wrapper { position: relative; width: 44px; height: 34px; flex-shrink: 0; }
+
         .pos-box { 
             background: #4A148C; color: #fff; font-family: 'Oswald', sans-serif; 
             font-size: 22px; 
@@ -137,21 +124,26 @@
             color: #B89947;
             font-size: 20px;
             font-weight: 400;
-            width: 12px;
+            width: 14px;
             text-align: center;
+            flex-shrink: 0;
         }
 
         .player-select { 
             -webkit-appearance: none; -moz-appearance: none; appearance: none; 
             background: transparent; border: none; 
             color: #fff; font-size: 24px; font-weight: bold; cursor: pointer; outline: none; 
-            width: 100%; 
             height: 40px; 
             line-height: 40px; 
             text-shadow: 2px 2px 4px #000;
-            padding: 0 12px 0 2px; /* 安全防護距離 */
+            padding: 0; 
         }
-        .player-select option { color: #000; background: #fff; }
+        
+        /* 🌟 給予名字絕對寬度，讓背號固定在旁邊 🌟 */
+        .starter-select {
+            width: 160px; /* 完美容納 4~5 個字的絕對寬度 */
+            flex-shrink: 0;
+        }
 
         .jersey-num { 
             font-family: 'Oswald', sans-serif; 
@@ -160,28 +152,38 @@
             opacity: 0; transition: 0.3s; 
             width: 45px; 
             text-align: left;
-            margin-left: 0; 
         }
         .jersey-num.active { opacity: 1; }
 
-        /* 🌟 預備區極致優化：減少左側 padding，榨出更多寬度 🌟 */
-        .reserves-section { background: rgba(0,0,0,0.3); padding: 10px 8px 10px 4px; border-radius: 8px; border-left: 2px solid rgba(255,255,255,0.2); height: 100%; box-sizing: border-box; }
+        /* 🌟 取消 height: 100%，讓框線收斂包覆 🌟 */
+        .reserves-section { 
+            background: rgba(0,0,0,0.3); padding: 10px 6px 10px 4px; 
+            border-radius: 8px; border-left: 2px solid rgba(255,255,255,0.2); 
+            box-sizing: border-box; 
+            height: fit-content; 
+        }
         
         .reserves-title { color: #B89947; font-size: 14px; margin-bottom: 8px; font-weight: bold; letter-spacing: 2px; border-left: 3px solid #B89947; padding-left: 8px; margin-left: 4px;}
         
         .reserves-list { display: flex; flex-direction: column; gap: 7px; }
         
-        /* 🌟 預備球員列緊湊化 🌟 */
         .reserve-row { display: flex; align-items: center; width: 100%; gap: 6px; justify-content: flex-start;} 
+        .reserve-row .order-num { font-size: 20px; color: #888; width: 18px; text-align: left; padding-left: 2px; text-shadow: none;}
         
-        /* 🌟 序號向左移：縮減寬度並靠左對齊 🌟 */
-        .reserve-row .order-num { font-size: 22px; color: #888; width: 20px; text-align: left; padding-left: 2px; text-shadow: none;}
-        
-        .reserve-row .player-select { font-size: 23px; flex: 1; min-width: 0; text-align: left; padding: 0 10px 0 0;} 
+        /* 🌟 flex: 1 自動榨乾剩餘空間，4 字名徹底防禦 🌟 */
+        .reserve-select { font-size: 23px; flex: 1; min-width: 0; text-align: left; } 
         .reserve-row .jersey-num { font-size: 24px; width: 35px; text-align: right;} 
 
-        .btn-group { display: flex; gap: 12px; margin-top: 8px;}
-        button { font-size: 16px; padding: 10px 20px; font-weight: bold; color: #fff; border: none; border-radius: 8px; cursor: pointer; background: #4A148C; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        /* 🌟 中間欄位對齊：建立與上方相同的隱形網格 🌟 */
+        .bottom-action-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+            width: 100%;
+        }
+        .btn-group { display: flex; gap: 10px; justify-content: center; }
+        button { font-size: 15px; padding: 10px 0; flex: 1; font-weight: bold; color: #fff; border: none; border-radius: 8px; cursor: pointer; background: #4A148C; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         button:hover { background: #673AB7; transform: translateY(-2px); }
         #share-line-btn { background: #06C755; }
     </style>
@@ -219,24 +221,15 @@
                 
                 <div class="lineup-list" style="margin-top: 7px;">
                     <div class="lineup-row" id="sp-row">
-                        <div class="starter-left-col">
-                            <div class="order-num sp-num">SP</div>
-                            <div style="position:relative;">
-                                <select class="pos-select-hidden" disabled><option value="P">P</option></select>
-                                <div class="pos-box"><span>P</span></div>
-                            </div>
-                            <div class="pos-num-text">1</div>
-                            <select class="player-select"><option value="">-- 球員 --</option></select>
+                        <div class="order-num sp-num">SP</div>
+                        <div class="pos-wrapper">
+                            <select class="pos-select-hidden" disabled><option value="P">P</option></select>
+                            <div class="pos-box"><span>P</span></div>
                         </div>
-                        <div class="starter-right-col">
-                            <div class="jersey-num"></div>
-                        </div>
+                        <div class="pos-num-text">1</div>
+                        <select class="player-select starter-select"><option value="">-- 球員 --</option></select>
+                        <div class="jersey-num"></div>
                     </div>
-                </div>
-
-                <div class="btn-group">
-                    <button id="export-btn">📸 下載圖檔</button>
-                    <button id="share-line-btn">🟢 分享至 LINE</button>
                 </div>
             </div>
 
@@ -247,6 +240,13 @@
                 </div>
             </div>
         </div>
+
+        <div class="bottom-action-area">
+            <div></div> <div class="btn-group">
+                <button id="export-btn">📸 下載圖檔</button>
+                <button id="share-line-btn">🟢 分享至 LINE</button>
+            </div>
+            <div></div> </div>
     </div>
 
     <div class="right-panel">
@@ -280,26 +280,20 @@
         row.className = type === 'reserve' ? 'reserve-row' : 'lineup-row';
         
         if (type === 'starter') {
-            let numHtml = `<div class="order-num">${index}</div>
-                <div style="position:relative;">
+            row.innerHTML = `
+                <div class="order-num">${index}</div>
+                <div class="pos-wrapper">
                     <select class="pos-select-hidden"></select>
                     <div class="pos-box"><span>-</span></div>
-                </div>`;
-                
-            row.innerHTML = `
-                <div class="starter-left-col">
-                    ${numHtml}
-                    <div class="pos-num-text"></div>
-                    <select class="player-select"><option value="">-- 球員 --</option></select>
                 </div>
-                <div class="starter-right-col">
-                    <div class="jersey-num"></div>
-                </div>
+                <div class="pos-num-text"></div>
+                <select class="player-select starter-select"><option value="">-- 球員 --</option></select>
+                <div class="jersey-num"></div>
             `;
         } else if (type === 'reserve') {
             row.innerHTML = `
                 <div class="order-num">${index}</div>
-                <select class="player-select"><option value="">-- 球員 --</option></select>
+                <select class="player-select reserve-select"><option value="">-- 球員 --</option></select>
                 <div class="jersey-num"></div>
             `;
         }
@@ -316,6 +310,7 @@
                 posText.textContent = val || '-'; 
                 posNumText.textContent = posNumMap[val] || ''; 
             });
+            posHidden.innerHTML = '<option value="">位</option>' + posList.map(pos => `<option value="${pos}">${pos}</option>`).join('');
         }
         
         pSelect.addEventListener('change', () => {
@@ -329,10 +324,6 @@
             }
             validateForm();
         });
-
-        if (type === 'starter') {
-            posHidden.innerHTML = '<option value="">位</option>' + posList.map(pos => `<option value="${pos}">${pos}</option>`).join('');
-        }
 
         container.appendChild(row);
     }
@@ -384,7 +375,7 @@
     });
 
     async function handleShare() {
-        const btnGroup = document.querySelector('.btn-group');
+        const btnGroup = document.querySelector('.bottom-action-area');
         btnGroup.style.opacity = '0'; 
         await new Promise(r => setTimeout(r, 100));
         
