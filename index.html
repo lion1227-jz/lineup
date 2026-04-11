@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - STARTING LINEUP V31</title>
+    <title>JZ BASEBALL TEAM - STARTING LINEUP V32</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -80,7 +80,6 @@
             cursor: pointer; opacity: 1;
         }
 
-        /* 🌟 精準切割：先發 70% / 預備 30% 🌟 */
         .roster-split {
             display: flex; 
             gap: 12px; flex: 1;
@@ -90,7 +89,6 @@
 
         .lineup-list { display: flex; flex-direction: column; gap: 7px; }
         
-        /* 🌟 線性緊湊排列：讓背號緊貼名字 🌟 */
         .lineup-row { 
             display: flex; 
             align-items: center; 
@@ -129,6 +127,7 @@
             flex-shrink: 0;
         }
 
+        /* 🌟 修正 iOS 白底白字 Bug：加入 .error 類別與 :focus 狀態強制切換 🌟 */
         .player-select { 
             -webkit-appearance: none; -moz-appearance: none; appearance: none; 
             background: transparent; border: none; 
@@ -137,11 +136,29 @@
             line-height: 40px; 
             text-shadow: 2px 2px 4px #000;
             padding: 0; 
+            transition: all 0.2s ease;
         }
         
-        /* 🌟 給予名字絕對寬度，讓背號固定在旁邊 🌟 */
+        .player-select option { color: #000; background: #fff; }
+        
+        /* 點擊時強制變成白底黑字，這樣手機彈出原生選單時才會是清晰的黑字 */
+        .player-select:focus {
+            background: rgba(255, 255, 255, 0.95);
+            color: #000 !important;
+            text-shadow: none !important;
+            border-radius: 4px;
+            padding: 0 4px;
+        }
+
+        /* 重複球員的警告紅色 */
+        .player-select.error {
+            color: #FF3B30 !important;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8) !important;
+        }
+        
+        /* 🌟 精密像素狙擊：寬度設為 154px，讓背號剛好推擠到「區」字底下 🌟 */
         .starter-select {
-            width: 160px; /* 完美容納 4~5 個字的絕對寬度 */
+            width: 154px; 
             flex-shrink: 0;
         }
 
@@ -155,7 +172,6 @@
         }
         .jersey-num.active { opacity: 1; }
 
-        /* 🌟 取消 height: 100%，讓框線收斂包覆 🌟 */
         .reserves-section { 
             background: rgba(0,0,0,0.3); padding: 10px 6px 10px 4px; 
             border-radius: 8px; border-left: 2px solid rgba(255,255,255,0.2); 
@@ -170,11 +186,9 @@
         .reserve-row { display: flex; align-items: center; width: 100%; gap: 6px; justify-content: flex-start;} 
         .reserve-row .order-num { font-size: 20px; color: #888; width: 18px; text-align: left; padding-left: 2px; text-shadow: none;}
         
-        /* 🌟 flex: 1 自動榨乾剩餘空間，4 字名徹底防禦 🌟 */
         .reserve-select { font-size: 23px; flex: 1; min-width: 0; text-align: left; } 
         .reserve-row .jersey-num { font-size: 24px; width: 35px; text-align: right;} 
 
-        /* 🌟 中間欄位對齊：建立與上方相同的隱形網格 🌟 */
         .bottom-action-area {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -242,11 +256,13 @@
         </div>
 
         <div class="bottom-action-area">
-            <div></div> <div class="btn-group">
+            <div></div> 
+            <div class="btn-group">
                 <button id="export-btn">📸 下載圖檔</button>
                 <button id="share-line-btn">🟢 分享至 LINE</button>
             </div>
-            <div></div> </div>
+            <div></div> 
+        </div>
     </div>
 
     <div class="right-panel">
@@ -263,14 +279,20 @@
     
     const posNumMap = { "P": "1", "C": "2", "1B": "3", "2B": "4", "3B": "5", "SS": "6", "LF": "7", "CF": "8", "RF": "9", "DH": "" };
 
+    /* 🌟 改寫驗證邏輯，使用 classList 切換來避免與 focus 狀態衝突 🌟 */
     function validateForm() {
         const pSelects = Array.from(document.querySelectorAll('.player-select'));
         const pValues = pSelects.map(s => s.value).filter(v => v !== "");
         pSelects.forEach(select => {
-            if (select.value === "") select.style.color = "#fff";
-            else {
+            if (select.value === "") {
+                select.classList.remove('error');
+            } else {
                 const count = pValues.filter(v => v === select.value).length;
-                select.style.color = count > 1 ? "#FF3B30" : "#fff";
+                if (count > 1) {
+                    select.classList.add('error');
+                } else {
+                    select.classList.remove('error');
+                }
             }
         });
     }
