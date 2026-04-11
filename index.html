@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - STARTING LINEUP V29</title>
+    <title>JZ BASEBALL TEAM - STARTING LINEUP V30</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -18,7 +18,6 @@
             box-shadow: 0 5px 20px rgba(0,0,0,0.8);
         }
 
-        /* 🌟 擴展左側版面，給予四字姓名絕對充足的實體空間 🌟 */
         .left-panel { 
             width: 64%; padding: 20px 20px 20px 25px; z-index: 10; 
             background: linear-gradient(to right, #001529 90%, transparent);
@@ -40,7 +39,6 @@
             position: relative; z-index: 2;
         }
 
-        /* 右側版面順應縮減，不影響背景美觀 */
         .right-panel { 
             width: 36%; 
             background-image: url('https://lh3.googleusercontent.com/d/1UfvVaUAMRQ3EXtYLQQjOvvFGv8zmk0PN'); 
@@ -60,7 +58,7 @@
 
         .header-title { font-family: 'Oswald', sans-serif; font-size: 43px; font-style: italic; color: #fff; margin: -5px 0 5px 0; line-height: 1; letter-spacing: 2px; text-shadow: 4px 4px 0 #4A148C; }
         
-        /* 🌟 資訊列：完美平均三等份 (1fr 1fr 1fr) 🌟 */
+        /* 資訊列維持 1:1:1 平均分配 */
         .game-info-grid { 
             display: grid; 
             grid-template-columns: 1fr 1fr 1fr; 
@@ -73,7 +71,6 @@
             padding-left: 10px;
         }
         
-        /* 🌟 資訊列：字體放大至 19px 🌟 */
         .game-info-grid input, .game-info-grid select { 
             background: transparent; border: none; color: #B89947; font-size: 19px; font-weight: bold; outline: none; cursor: pointer; width: 100%;
         }
@@ -84,10 +81,10 @@
             cursor: pointer; opacity: 1;
         }
 
-        /* 🌟 先發名單重構：給予第一欄 (1.8fr) 極大空間，背號自動向右退 🌟 */
+        /* 🌟 重大調整：左側版圖稍微縮回，背號自動拉近。同時給預備區(1.2fr)更多空間 🌟 */
         .roster-split {
             display: grid; 
-            grid-template-columns: 1.8fr 0.65fr 1.15fr; 
+            grid-template-columns: 1.6fr 0.8fr 1.2fr; 
             gap: 12px; flex: 1;
         }
         
@@ -98,13 +95,14 @@
         
         .lineup-row { 
             display: grid; 
-            grid-template-columns: 1.8fr 0.65fr; 
+            grid-template-columns: 1.6fr 0.8fr; 
             gap: 12px; 
             align-items: center; 
         } 
         
+        /* 🌟 瘦身術：間距從 12px 縮為 8px 🌟 */
         .starter-left-col {
-            display: flex; align-items: center; gap: 12px; 
+            display: flex; align-items: center; gap: 8px; 
         }
         
         .starter-right-col {
@@ -112,36 +110,37 @@
             padding-left: 2px; 
         }
 
+        /* 🌟 瘦身術：棒次寬度縮小 🌟 */
         .order-num { 
             font-family: 'Oswald', sans-serif; font-size: 24px; font-style: italic; color: #fff; 
-            width: 38px; min-width: 38px; flex-shrink: 0; 
+            width: 30px; min-width: 30px; flex-shrink: 0; 
             text-align: center; text-shadow: 2px 2px 0 #673AB7; 
         }
         
         .sp-num { 
-            color: #B388FF; font-size: 24px; 
+            color: #B388FF; font-size: 22px; /* SP 稍微縮小以適應 30px 寬度 */
         }
 
+        /* 🌟 瘦身術：守備方塊微調寬度 🌟 */
         .pos-box { 
             background: #4A148C; color: #fff; font-family: 'Oswald', sans-serif; 
-            font-size: 24px; 
-            width: 50px; height: 34px; 
+            font-size: 22px; 
+            width: 44px; height: 34px; 
             display: flex; justify-content: center; align-items: center; 
             transform: skewX(-10deg); border-left: 3px solid #B89947; 
         }
         .pos-box span { transform: skewX(10deg); }
-        .pos-select-hidden { position: absolute; opacity: 0; width: 50px; height: 34px; cursor: pointer; z-index: 5; }
+        .pos-select-hidden { position: absolute; opacity: 0; width: 44px; height: 34px; cursor: pointer; z-index: 5; }
 
         .pos-num-text {
             font-family: 'Oswald', sans-serif;
             color: #B89947;
             font-size: 20px;
             font-weight: 400;
-            width: 14px;
+            width: 12px;
             text-align: center;
         }
 
-        /* 選單：擁有極大物理空間，徹底杜絕 4 字被切 */
         .player-select { 
             -webkit-appearance: none; -moz-appearance: none; appearance: none; 
             background: transparent; border: none; 
@@ -150,7 +149,7 @@
             height: 40px; 
             line-height: 40px; 
             text-shadow: 2px 2px 4px #000;
-            padding: 0 15px 0 2px; 
+            padding: 0 12px 0 2px; /* 安全防護距離 */
         }
         .player-select option { color: #000; background: #fff; }
 
@@ -165,17 +164,21 @@
         }
         .jersey-num.active { opacity: 1; }
 
-        .reserves-section { background: rgba(0,0,0,0.3); padding: 10px 10px; border-radius: 8px; border-left: 2px solid rgba(255,255,255,0.2); height: 100%; box-sizing: border-box; }
+        /* 🌟 預備區極致優化：減少左側 padding，榨出更多寬度 🌟 */
+        .reserves-section { background: rgba(0,0,0,0.3); padding: 10px 8px 10px 4px; border-radius: 8px; border-left: 2px solid rgba(255,255,255,0.2); height: 100%; box-sizing: border-box; }
         
-        .reserves-title { color: #B89947; font-size: 14px; margin-bottom: 8px; font-weight: bold; letter-spacing: 2px; border-left: 3px solid #B89947; padding-left: 8px; }
+        .reserves-title { color: #B89947; font-size: 14px; margin-bottom: 8px; font-weight: bold; letter-spacing: 2px; border-left: 3px solid #B89947; padding-left: 8px; margin-left: 4px;}
         
         .reserves-list { display: flex; flex-direction: column; gap: 7px; }
         
-        .reserve-row { display: flex; align-items: center; width: 100%; gap: 12px; justify-content: flex-start;} 
-        /* 預備球員選單改為彈性填滿，不怕 4 字姓名 */
-        .reserve-row .player-select { font-size: 24px; flex: 1; text-align: left;} 
-        .reserve-row .jersey-num { font-size: 24px; width: 35px; text-align: left;} 
-        .reserve-row .order-num { font-size: 24px; color: #888; width: 25px; text-align: center; text-shadow: none;}
+        /* 🌟 預備球員列緊湊化 🌟 */
+        .reserve-row { display: flex; align-items: center; width: 100%; gap: 6px; justify-content: flex-start;} 
+        
+        /* 🌟 序號向左移：縮減寬度並靠左對齊 🌟 */
+        .reserve-row .order-num { font-size: 22px; color: #888; width: 20px; text-align: left; padding-left: 2px; text-shadow: none;}
+        
+        .reserve-row .player-select { font-size: 23px; flex: 1; min-width: 0; text-align: left; padding: 0 10px 0 0;} 
+        .reserve-row .jersey-num { font-size: 24px; width: 35px; text-align: right;} 
 
         .btn-group { display: flex; gap: 12px; margin-top: 8px;}
         button { font-size: 16px; padding: 10px 20px; font-weight: bold; color: #fff; border: none; border-radius: 8px; cursor: pointer; background: #4A148C; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
