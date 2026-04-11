@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - STARTING LINEUP V32</title>
+    <title>JZ BASEBALL TEAM - STARTING LINEUP V33</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -127,7 +127,7 @@
             flex-shrink: 0;
         }
 
-        /* 🌟 修正 iOS 白底白字 Bug：加入 .error 類別與 :focus 狀態強制切換 🌟 */
+        /* 🌟 徹底拔除 :focus 反白設定，回歸最純淨的文字陰影樣式 🌟 */
         .player-select { 
             -webkit-appearance: none; -moz-appearance: none; appearance: none; 
             background: transparent; border: none; 
@@ -136,29 +136,19 @@
             line-height: 40px; 
             text-shadow: 2px 2px 4px #000;
             padding: 0; 
-            transition: all 0.2s ease;
         }
         
         .player-select option { color: #000; background: #fff; }
-        
-        /* 點擊時強制變成白底黑字，這樣手機彈出原生選單時才會是清晰的黑字 */
-        .player-select:focus {
-            background: rgba(255, 255, 255, 0.95);
-            color: #000 !important;
-            text-shadow: none !important;
-            border-radius: 4px;
-            padding: 0 4px;
-        }
 
-        /* 重複球員的警告紅色 */
         .player-select.error {
             color: #FF3B30 !important;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.8) !important;
         }
         
-        /* 🌟 精密像素狙擊：寬度設為 154px，讓背號剛好推擠到「區」字底下 🌟 */
+        /* 🌟 神級平移：將寬度收緊至 128px，並向右平移 22px。完美縮短距離並對齊「區」字 🌟 */
         .starter-select {
-            width: 154px; 
+            width: 128px; 
+            margin-left: 22px; /* 將名字往右推，拉近與背號的距離 */
             flex-shrink: 0;
         }
 
@@ -279,7 +269,6 @@
     
     const posNumMap = { "P": "1", "C": "2", "1B": "3", "2B": "4", "3B": "5", "SS": "6", "LF": "7", "CF": "8", "RF": "9", "DH": "" };
 
-    /* 🌟 改寫驗證邏輯，使用 classList 切換來避免與 focus 狀態衝突 🌟 */
     function validateForm() {
         const pSelects = Array.from(document.querySelectorAll('.player-select'));
         const pValues = pSelects.map(s => s.value).filter(v => v !== "");
