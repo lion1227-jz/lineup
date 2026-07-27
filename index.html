@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - STARTING LINEUP V36</title>
+    <title>JZ BASEBALL TEAM - 攻守名單 (灰框對調版)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -12,205 +13,166 @@
         body { font-family: '微軟正黑體', Arial, sans-serif; background: #111; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; min-height: 100vh; color: #fff; }
 
         #capture-area {
-            width: 1080px; height: auto; 
-            background-color: #000;
+            width: 756px; height: auto; 
+            background-color: #0c0814;
             background-image: radial-gradient(circle at 50% 30%, #1a103c 0%, #0c0814 80%);
             display: flex; position: relative; overflow: visible;
             box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+            padding: 20px;
             box-sizing: border-box;
         }
 
-        .main-container {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            position: relative; z-index: 10;
-            padding: 20px 20px 20px 25px;
+        .main-container { width: 100%; display: flex; flex-direction: column; position: relative; z-index: 2; }
+
+        /* 表頭 LOGO 去背與加大 */
+        .header-container {
+            display: flex; justify-content: center; align-items: center; gap: 15px;
+            margin-bottom: 15px; border-bottom: 2px solid rgba(255,255,255,0.15); padding-bottom: 12px;
+        }
+        .header-logo { 
+            width: 60px; height: 60px; object-fit: contain; 
+            mix-blend-mode: screen; 
+            filter: brightness(1.2); 
+        }
+        .header-title { 
+            font-family: 'Oswald', sans-serif; font-size: 18pt; font-weight: bold; color: #fff; 
+            letter-spacing: 3px; text-shadow: 0 0 10px rgba(179,136,255,0.5);
         }
 
-        .watermark-logo {
-            position: absolute; 
-            top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 90%; height: auto;
-            opacity: 0.09;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .header-title { font-family: 'Oswald', sans-serif; font-size: 43px; font-style: italic; color: #fff; margin: -5px 0 5px 0; line-height: 1; letter-spacing: 2px; text-shadow: 4px 4px 0 #4A148C; }
-        
+        /* 比賽資訊列：背景完美包覆 */
         .game-info-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr 1fr; 
-            gap: 12px; padding-bottom: 10px; 
-            border-bottom: 2px solid rgba(255,255,255,0.3); margin-bottom: 15px; 
+            display: grid; grid-template-columns: 1fr 1fr 1fr; 
+            gap: 12px; margin-bottom: 15px; 
+            background: rgba(0,0,0,0.4); padding: 15px 12px; border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .info-cell { display: flex; align-items: center; gap: 8px; }
+        .info-cell { display: flex; align-items: center; gap: 6px; font-size: 18pt; color: #ddd; min-height: 40px; }
+        .info-cell span { font-weight: bold; color: #B89947; white-space: nowrap; font-size: 18pt; }
         
         .game-info-grid input, .game-info-grid select { 
-            background: transparent; border: none; color: #B89947; font-size: 19px; font-weight: bold; outline: none; cursor: pointer; width: 100%;
+            background: transparent; border: none; color: #fff; font-size: 18pt; font-weight: bold; outline: none; cursor: pointer; width: 100%;
+            border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 3px;
+            line-height: 1.4;
         }
 
+        /* 日曆與時鐘圖示深紫色 */
         input[type="date"]::-webkit-calendar-picker-indicator,
         input[type="time"]::-webkit-calendar-picker-indicator {
-            filter: invert(1) brightness(2);
+            filter: invert(18%) sepia(85% saturate(600%) hue-rotate(255deg));
             cursor: pointer; opacity: 1;
         }
 
-        /* 🌟 回歸最穩定的 70/30 佈局 🌟 */
-        .roster-split {
-            display: flex; 
-            gap: 12px;
-        }
-        .starters-col { width: 68%; display: flex; flex-direction: column; gap: 7px;}
-        .bench-col { width: 32%; display: flex; flex-direction: column; gap: 7px;}
+        .roster-split { display: flex; gap: 15px; width: 100%; }
+        .starters-col { width: 63%; display: flex; flex-direction: column; }
+        .bench-col { width: 37%; display: flex; flex-direction: column; }
 
-        /* 🌟 線性排列，保證不跑版 🌟 */
+        .lineup-list { display: flex; flex-direction: column; gap: 6px; }
+        
+        /* 🌟 經典灰框版單列排版 🌟 */
         .lineup-row { 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            background: rgba(255, 255, 255, 0.08);
-            padding: 5px 10px;
-            border-radius: 6px;
+            display: grid; 
+            grid-template-columns: 55px 159px 55px 1fr; 
+            align-items: center; gap: 12px; 
+            background: rgba(255,255,255,0.04); padding: 4px 10px; border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.08);
         } 
         
+        /* 所有文字統一為 18pt */
         .order-num { 
-            font-family: 'Oswald', sans-serif; font-size: 24px; font-style: italic; color: #fff; 
-            width: 28px; min-width: 28px; flex-shrink: 0; 
-            text-align: center; text-shadow: 2px 2px 0 #673AB7; 
-        }
-        
-        .sp-num { 
-            color: #B388FF; font-size: 22px; 
-        }
-
-        .pos-wrapper { position: relative; width: 44px; height: 34px; flex-shrink: 0; }
-
-        .pos-box { 
             background: #4A148C; color: #fff; font-family: 'Oswald', sans-serif; 
-            font-size: 22px; 
-            width: 44px; height: 34px; 
+            font-size: 18pt; font-style: italic; 
+            height: 38px; 
             display: flex; justify-content: center; align-items: center; 
             border-radius: 4px;
         }
-        .pos-select-hidden { position: absolute; opacity: 0; width: 44px; height: 34px; cursor: pointer; z-index: 5; }
 
-        /* 經典白色圓圈背號 (移到左邊) */
+        /* 🌟 經典灰框/白框輸入框與點開選單黑字 🌟 */
+        .player-select { 
+            -webkit-appearance: none; appearance: none; 
+            background: #f5f5f5; border: 1px solid #ccc; 
+            color: #000; font-size: 18pt; font-weight: bold; outline: none; 
+            width: 100%; height: 38px; line-height: 38px;
+            padding: 0 5px; border-radius: 4px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            cursor: pointer; box-sizing: border-box;
+        }
+        .player-select option { background: #fff; color: #000; font-size: 14pt; }
+
+        /* 經典紫色圓圈背號：精準對齊上方「休息區」的「休」字下方 */
         .jersey-num-circle { 
-            width: 38px; height: 38px;
-            border-radius: 50%;
-            background-color: white;
-            color: black;
-            font-family: 'Oswald', sans-serif; 
-            font-size: 24px; 
-            font-weight: bold;
+            width: 38px; height: 38px; border-radius: 50%;
+            background: #311b92; color: #b388ff;
             display: flex; justify-content: center; align-items: center;
-            opacity: 0; transition: 0.3s; 
-            flex-shrink: 0;
-            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            font-size: 18pt; font-family: 'Oswald', sans-serif; font-weight: bold;
+            opacity: 0; transition: 0.2s; justify-self: center;
         }
         .jersey-num-circle.active { opacity: 1; }
 
-        .player-select { 
-            -webkit-appearance: none; -moz-appearance: none; appearance: none; 
-            background: transparent; border: none; 
-            color: #fff; font-size: 24px; font-weight: bold; cursor: pointer; outline: none; 
-            height: 40px; 
-            line-height: 40px; 
-            text-shadow: 2px 2px 4px #000;
-            padding: 0; 
-            flex: 1; /* 彈性填滿其餘空間 */
-            min-width: 0; /* 防止超出 */
+        /* 🌟 經典灰框守位選單 (已對調至最右側) 🌟 */
+        .pos-select {
+            -webkit-appearance: none; appearance: none;
+            background: #f5f5f5; border: 1px solid #ccc;
+            color: #4A148C; font-family: 'Oswald', sans-serif; font-size: 18pt; font-weight: bold;
+            width: 100%; height: 38px; border-radius: 4px; text-align: center; cursor: pointer; outline: none;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); box-sizing: border-box;
         }
-        
-        .player-select option { color: #000; background: #fff; }
+        .pos-select option { background: #fff; color: #000; }
 
-        .player-select.error {
-            color: #FF3B30 !important;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.8) !important;
+        /* 預備球員專用 Grid (寬度足夠容納 8 字元) */
+        .reserve-row { 
+            display: grid; 
+            grid-template-columns: 45px 1fr 55px; 
+            align-items: center; gap: 10px; 
+            background: rgba(255,255,255,0.04); padding: 4px 8px; border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.08); margin-bottom: 6px;
         }
+        .reserve-row .order-num { font-size: 16pt; font-style: normal; background: #333; color: #aaa; height: 38px; }
 
-        .reserves-section { 
-            background: rgba(0,0,0,0.3); padding: 10px; 
-            border-radius: 8px; border-left: 2px solid rgba(255,255,255,0.2); 
-            box-sizing: border-box; 
-            height: fit-content; 
-        }
-        
-        .reserves-title { color: #B89947; font-size: 18px; margin-bottom: 8px; font-weight: bold; letter-spacing: 2px; }
-        
-        .reserves-list { display: flex; flex-direction: column; gap: 7px; }
-        
-        /* 🌟 預備區結構對調 🌟 */
-        .reserve-row { display: flex; align-items: center; gap: 8px; } 
-        .reserve-row .order-num { font-size: 20px; color: #888; width: 18px; text-shadow: none;}
-        .reserve-row .player-select { font-size: 23px; } 
-
-        .bottom-action-area {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-            width: 100%;
-            justify-content: center;
-        }
-        button { font-size: 18px; padding: 12px 30px; font-weight: bold; color: #fff; border: none; border-radius: 8px; cursor: pointer; background: #4A148C; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        button:hover { background: #673AB7; transform: translateY(-2px); }
+        .bottom-action-area { display: flex; gap: 15px; margin-top: 15px; justify-content: center; width: 100%; }
+        button { font-size: 16pt; padding: 10px 25px; font-weight: bold; color: #fff; border: none; border-radius: 8px; cursor: pointer; background: #4A148C; transition: 0.3s; }
         #share-line-btn { background: #06C755; }
     </style>
 </head>
 <body>
 
 <div id="capture-area">
-    <img class="watermark-logo" src="https://lh3.googleusercontent.com/d/1aooCsOuMMtwMhT5bay4kDQCAq9sbm3kW" crossorigin="anonymous" alt="Watermark">
-    
     <div class="main-container">
-        <h1 class="header-title">STARTING LINEUP</h1>
+        <div class="header-container">
+            <img class="header-logo" src="https://lh3.googleusercontent.com/d/1aooCsOuMMtwMhT5bay4kDQCAq9sbm3kW" crossorigin="anonymous">
+            <div class="header-title">🔥 攻 守 名 單 🔥</div>
+        </div>
         
         <div class="game-info-grid">
-            <div class="info-cell"><input type="date" id="game-date"></div>
-            <div class="info-cell">
-                <span style="color:#B89947; font-size:19px; font-weight:bold;">集合</span>
-                <input type="time" value="08:00">
-            </div>
-            <div class="info-cell">
-                <span style="color:#B89947; font-size:19px; font-weight:bold;">比賽</span>
-                <input type="time" value="09:00">
-            </div>
+            <div class="info-cell"><span>日期：</span><input type="date" id="game-date"></div>
+            <div class="info-cell"><span>集合：</span><input type="time" value="08:30"></div>
+            <div class="info-cell"><span>比賽：</span><input type="time" value="10:00"></div>
             
-            <div class="info-cell"><select id="game-location"><option value="">選擇球場...</option></select></div>
+            <div class="info-cell"><span>地點：</span><select id="game-location"><option value="">選擇...</option></select></div>
             <div class="info-cell">
+                <span>休息區：</span>
                 <select id="bench-side">
-                    <option value="">休息區...</option>
+                    <option value="">選擇...</option>
                     <option value="一壘側">一壘側</option>
                     <option value="三壘側">三壘側</option>
                 </select>
             </div>
-            <div class="info-cell"><input type="text" placeholder="輸入對手名稱..."></div>
+            <div class="info-cell"><span>對戰：</span><input type="text" placeholder="對手名稱..."></div>
         </div>
 
         <div class="roster-split">
             <div class="starters-col">
-                <div class="starters-col" id="starters-board"></div>
-                
-                <div class="list-container" style="margin-top: 7px;">
+                <div class="lineup-list" id="starters-board"></div>
+                <div class="lineup-list" style="margin-top: 6px;">
                     <div class="lineup-row" id="sp-row">
-                        <div class="order-num sp-num">P</div>
-                        <div class="pos-wrapper">
-                            <select class="pos-select-hidden" disabled><option value="P">P</option></select>
-                            <div class="pos-box">P</div>
-                        </div>
-                        <div class="jersey-num-circle"></div>
+                        <div class="order-num" style="background:#311B92;">P</div>
                         <select class="player-select"><option value="">-- 球員 --</option></select>
+                        <div class="jersey-num-circle"></div>
+                        <select class="pos-select" disabled><option>P (1)</option></select>
                     </div>
                 </div>
             </div>
-
             <div class="bench-col">
-                <div class="reserves-section">
-                    <div class="reserves-title">預備球員</div>
-                    <div class="reserves-list" id="reserves-board"></div>
-                </div>
+                <div id="reserves-board"></div>
             </div>
         </div>
 
@@ -223,142 +185,24 @@
 
 <script>
     document.getElementById('game-date').value = new Date().toISOString().split('T')[0];
-
     const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQE8qU7MUo8mltMrnQSLttK1ePGuN2ooTaD3QBtoKsmvrW5tEKOjSXwGm9bwhZtgy2veLF-QLTpe33q/pub?output=csv";
     let playersData = [];
-    const posList = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH"];
-    
-    function validateForm() {
-        const pSelects = Array.from(document.querySelectorAll('.player-select'));
-        const pValues = pSelects.map(s => s.value).filter(v => v !== "");
-        pSelects.forEach(select => {
-            if (select.value === "") {
-                select.classList.remove('error');
-            } else {
-                const count = pValues.filter(v => v === select.value).length;
-                if (count > 1) {
-                    select.classList.add('error');
-                } else {
-                    select.classList.remove('error');
-                }
-            }
-        });
-    }
+    /* 🌟 守位與代碼間隔 1 個字元寬度 🌟 */
+    const posList = ["C (2)", "1B (3)", "2B (4)", "3B (5)", "SS (6)", "LF (7)", "CF (8)", "RF (9)", "DH"];
 
     function createRow(index, type, container) {
         const row = document.createElement('div');
-        row.className = type === 'bench' ? 'reserve-row lineup-row' : 'lineup-row';
-        
+        row.className = type === 'reserve' ? 'reserve-row' : 'lineup-row';
         if (type === 'starter') {
-            /* 🌟 正確的穩固結構對調：棒次 -> 守備 -> 背號圈 -> 姓名選單 🌟 */
+            /* 🌟 對調後的正確順序：棒次 -> 姓名灰框 -> 圓圈背號 -> 守位灰框 🌟 */
             row.innerHTML = `
                 <div class="order-num">${index}棒</div>
-                <div class="pos-wrapper">
-                    <select class="pos-select-hidden"></select>
-                    <div class="pos-box">-</div>
-                </div>
-                <div class="jersey-num-circle"></div>
                 <select class="player-select"><option value="">-- 球員 --</option></select>
-            `;
-        } else if (type === 'bench') {
-            /* 🌟 預備區統一：序號 -> 背號圈 -> 姓名選單 🌟 */
+                <div class="jersey-num-circle"></div>
+                <select class="pos-select">
+                    <option value="">守位</option>
+                    ${posList.map(p => `<option value="${p}">${p}</option>`).join('')}
+                </select>`;
+        } else {
             row.innerHTML = `
                 <div class="order-num">預</div>
-                <div class="jersey-num-circle"></div>
-                <select class="player-select"><option value="">-- 球員 --</option></select>
-            `;
-        }
-
-        const pSelect = row.querySelector('.player-select');
-        const posHidden = row.querySelector('.pos-select-hidden');
-        const posBox = row.querySelector('.pos-box');
-        const jerseyCirc = row.querySelector('.jersey-num-circle');
-
-        if (type === 'starter') {
-            posHidden.addEventListener('change', (e) => { 
-                posBox.textContent = e.target.value || '-'; 
-            });
-            posHidden.innerHTML = '<option value="">位</option>' + posList.map(pos => `<option value="${pos}">${pos}</option>`).join('');
-        }
-        
-        pSelect.addEventListener('change', () => {
-            const p = playersData.find(x => x.name === pSelect.value);
-            if (p && p.num) {
-                jerseyCirc.textContent = p.num;
-                jerseyCirc.classList.add('active');
-            } else {
-                jerseyCirc.textContent = '';
-                jerseyCirc.classList.remove('active');
-            }
-            validateForm();
-        });
-
-        container.appendChild(row);
-    }
-
-    function setupPitcherJersey() {
-        const pRow = document.getElementById('sp-row');
-        const pSelect = pRow.querySelector('.player-select');
-        const jerseyCirc = pRow.querySelector('.jersey-num-circle');
-
-        pSelect.addEventListener('change', () => {
-            const p = playersData.find(x => x.name === pSelect.value);
-            if (p && p.num) {
-                jerseyCirc.textContent = p.num;
-                jerseyCirc.classList.add('active');
-            } else {
-                jerseyCirc.textContent = '';
-                jerseyCirc.classList.remove('active');
-            }
-            validateForm();
-        });
-    }
-
-    for (let i = 1; i <= 9; i++) createRow(i, 'starter', document.getElementById('starters-board'));
-    setupPitcherJersey();
-    for (let i = 1; i <= 8; i++) createRow(i, 'bench', document.getElementById('reserves-board'));
-
-    Papa.parse(GOOGLE_SHEET_URL, {
-        download: true,
-        header: false,
-        complete: function(results) {
-            const data = results.data.slice(1);
-            playersData = data.map(row => ({ 
-                num: String(row[0]||"").trim(), 
-                name: String(row[1]||"").trim() 
-            })).filter(p => p.name !== "");
-            
-            const locations = Array.from(new Set(data.map(row => String(row[2]||"").trim()))).filter(loc => loc !== "");
-
-            document.getElementById('game-location').innerHTML = '<option value="">選擇球場...</option>' + locations.map(loc => `<option value="${loc}">${loc}</option>`).join('');
-            
-            document.querySelectorAll('.player-select').forEach(select => {
-                playersData.forEach(p => {
-                    const opt = document.createElement('option');
-                    opt.value = p.name; opt.textContent = p.name;
-                    select.appendChild(opt);
-                });
-            });
-        }
-    });
-
-    async function handleShare() {
-        const actionArea = document.querySelector('.bottom-action-area');
-        actionArea.style.opacity = '0'; 
-        await new Promise(r => setTimeout(r, 100));
-        
-        const canvas = await html2canvas(document.getElementById('capture-area'), { scale: 2, useCORS: true, backgroundColor: null });
-        actionArea.style.opacity = '1'; 
-
-        canvas.toBlob(async (blob) => {
-            const file = new File([blob], 'JZ_Lineup.png', { type: 'image/png' });
-            if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file] });
-            else { const link = document.createElement('a'); link.download = 'JZ_Lineup.png'; link.href = URL.createObjectURL(blob); link.click(); }
-        });
-    }
-
-    document.getElementById('export-btn').onclick = handleShare;
-    document.getElementById('share-line-btn').onclick = handleShare;
-</script>
-</body>
-</html>
