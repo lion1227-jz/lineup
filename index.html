@@ -3,284 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>第二版先發名單 - 完美乾淨對調版</title>
+    <title>JZ BASEBALL TEAM - 攻守名單 (灰框對調版)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
-        body {
-            font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
-            background-color: #0b0214;
-            color: white;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700;400&display=swap');
+
+        body { font-family: '微軟正黑體', Arial, sans-serif; background: #111; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; min-height: 100vh; color: #fff; }
 
         #capture-area {
-            width: 756px;
-            background: linear-gradient(180deg, #0f0326 0%, #17073b 50%, #090214 100%);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.6);
-            position: relative;
+            width: 756px; height: auto; 
+            background-color: #0c0814;
+            background-image: radial-gradient(circle at 50% 30%, #1a103c 0%, #0c0814 80%);
+            display: flex; position: relative; overflow: visible;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+            padding: 20px;
             box-sizing: border-box;
         }
 
-        .header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 25px;
+        .main-container { width: 100%; display: flex; flex-direction: column; position: relative; z-index: 2; }
+
+        /* 表頭 LOGO 去背與加大 */
+        .header-container {
+            display: flex; justify-content: center; align-items: center; gap: 15px;
+            margin-bottom: 15px; border-bottom: 2px solid rgba(255,255,255,0.15); padding-bottom: 12px;
         }
-        .header img {
-            width: 60px; height: 60px;
-            object-fit: contain;
+        .header-logo { 
+            width: 60px; height: 60px; object-fit: contain; 
             mix-blend-mode: screen; 
-            filter: brightness(1.2);
+            filter: brightness(1.2); 
         }
-        .header h1 {
-            font-size: 24pt; font-weight: bold; margin: 0; letter-spacing: 4px;
+        .header-title { 
+            font-family: 'Oswald', sans-serif; font-size: 18pt; font-weight: bold; color: #fff; 
+            letter-spacing: 3px; text-shadow: 0 0 10px rgba(179,136,255,0.5);
         }
 
-        /* 上方比賽資訊背景 */
-        .info-board {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 25px;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px;
+        /* 比賽資訊列：背景完美包覆 */
+        .game-info-grid { 
+            display: grid; grid-template-columns: 1fr 1fr 1fr; 
+            gap: 12px; margin-bottom: 15px; 
+            background: rgba(0,0,0,0.4); padding: 15px 12px; border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .info-group { display: flex; align-items: center; gap: 8px; font-size: 18pt; }
-        .info-group label { color: #a5a5a5; font-weight: bold; white-space: nowrap; }
-        .info-group input, .info-group select {
-            background: transparent; border: none; border-bottom: 1px solid #666;
-            color: white; font-size: 18pt; padding: 2px 5px; outline: none; width: 100%;
+        .info-cell { display: flex; align-items: center; gap: 6px; font-size: 18pt; color: #ddd; min-height: 40px; }
+        .info-cell span { font-weight: bold; color: #B89947; white-space: nowrap; font-size: 18pt; }
+        
+        .game-info-grid input, .game-info-grid select { 
+            background: transparent; border: none; color: #fff; font-size: 18pt; font-weight: bold; outline: none; cursor: pointer; width: 100%;
+            border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 3px;
+            line-height: 1.4;
         }
-        .info-group select option { background: #17073b; color: white; }
 
+        /* 日曆與時鐘圖示深紫色 */
         input[type="date"]::-webkit-calendar-picker-indicator,
         input[type="time"]::-webkit-calendar-picker-indicator {
             filter: invert(18%) sepia(85% saturate(600%) hue-rotate(255deg));
-            cursor: pointer;
+            cursor: pointer; opacity: 1;
         }
 
-        .content-split { display: flex; gap: 20px; }
-        .starters-section { width: 63%; }
-        .bench-section { width: 37%; }
+        .roster-split { display: flex; gap: 15px; width: 100%; }
+        .starters-col { width: 63%; display: flex; flex-direction: column; }
+        .bench-col { width: 37%; display: flex; flex-direction: column; }
 
-        .section-title {
-            font-size: 18pt; font-weight: bold; margin-bottom: 15px;
-            display: flex; align-items: center; gap: 8px;
-        }
-
-        .list-container { display: flex; flex-direction: column; gap: 10px; }
-
-        /* 先發單列：Grid 佈局精確控制 */
-        .row-item {
-            display: grid;
-            /* 調整寬度比例，讓背號完美對齊上方「休」字下方 */
-            grid-template-columns: 55px 159px 55px 1fr;
-            align-items: center; gap: 12px;
-            background: rgba(255,255,255,0.04);
-            padding: 8px 12px; border-radius: 6px;
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-
-        /* 統一字體大小為 18pt，並移除所有選單外觀 */
-        .pos-tag {
-            background: #5e35b1; color: white; border-radius: 4px;
-            height: 38px; display: flex; justify-content: center; align-items: center;
-            font-size: 18pt; font-weight: bold;
-        }
-
-        .player-select, .pos-select {
-            -webkit-appearance: none; appearance: none;
-            background: transparent; border: none;
-            color: white; font-size: 18pt; font-weight: bold;
-            height: 38px; line-height: 38px; padding: 0; outline: none;
-            width: 100%; cursor: pointer;
-        }
-        .player-select option, .pos-select option { background: #17073b; color: white; font-size: 14pt; }
+        .lineup-list { display: flex; flex-direction: column; gap: 6px; }
         
-        .pos-select {
-            color: #B89947;
-            text-align: right;
-        }
-
-        /* 背號文字樣式，完全移到姓名與守位之間 */
-        .jersey-num { 
-            font-family: 'Oswald', sans-serif; font-size: 18pt; 
-            color: #b388ff; font-style: italic; 
-            opacity: 0; transition: 0.2s; 
-            text-align: center;
-        }
-        .jersey-num.active { opacity: 1; }
-
-        /* 預備球員單列 */
-        .bench-item {
-            display: grid;
-            grid-template-columns: 45px 1fr 55px;
-            align-items: center; gap: 10px;
-            background: rgba(255,255,255,0.04);
-            padding: 8px 12px; border-radius: 6px;
+        /* 🌟 經典灰框版單列排版 🌟 */
+        .lineup-row { 
+            display: grid; 
+            grid-template-columns: 55px 159px 55px 1fr; 
+            align-items: center; gap: 12px; 
+            background: rgba(255,255,255,0.04); padding: 4px 10px; border-radius: 6px;
             border: 1px solid rgba(255,255,255,0.08);
+        } 
+        
+        /* 所有文字統一為 18pt */
+        .order-num { 
+            background: #4A148C; color: #fff; font-family: 'Oswald', sans-serif; 
+            font-size: 18pt; font-style: italic; 
+            height: 38px; 
+            display: flex; justify-content: center; align-items: center; 
+            border-radius: 4px;
         }
-        .bench-item .pos-tag { background: #424242; color: #aaa; font-size: 16pt; }
 
-        .actions { display: flex; gap: 15px; margin-top: 25px; justify-content: center; width: 100%; }
-        .btn {
-            font-size: 16pt; padding: 10px 25px; font-weight: bold; color: white;
-            border: none; border-radius: 8px; cursor: pointer; background: #5e35b1; transition: 0.2s;
+        /* 🌟 經典灰框/白框輸入框與點開選單黑字 🌟 */
+        .player-select { 
+            -webkit-appearance: none; appearance: none; 
+            background: #f5f5f5; border: 1px solid #ccc; 
+            color: #000; font-size: 18pt; font-weight: bold; outline: none; 
+            width: 100%; height: 38px; line-height: 38px;
+            padding: 0 5px; border-radius: 4px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            cursor: pointer; box-sizing: border-box;
         }
-        .btn-line { background: #06C755; }
+        .player-select option { background: #fff; color: #000; font-size: 14pt; }
+
+        /* 經典紫色圓圈背號：精準對齊上方「休息區」的「休」字下方 */
+        .jersey-num-circle { 
+            width: 38px; height: 38px; border-radius: 50%;
+            background: #311b92; color: #b388ff;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 18pt; font-family: 'Oswald', sans-serif; font-weight: bold;
+            opacity: 0; transition: 0.2s; justify-self: center;
+        }
+        .jersey-num-circle.active { opacity: 1; }
+
+        /* 🌟 經典灰框守位選單 (已對調至最右側) 🌟 */
+        .pos-select {
+            -webkit-appearance: none; appearance: none;
+            background: #f5f5f5; border: 1px solid #ccc;
+            color: #4A148C; font-family: 'Oswald', sans-serif; font-size: 18pt; font-weight: bold;
+            width: 100%; height: 38px; border-radius: 4px; text-align: center; cursor: pointer; outline: none;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); box-sizing: border-box;
+        }
+        .pos-select option { background: #fff; color: #000; }
+
+        /* 預備球員專用 Grid (寬度足夠容納 8 字元) */
+        .reserve-row { 
+            display: grid; 
+            grid-template-columns: 45px 1fr 55px; 
+            align-items: center; gap: 10px; 
+            background: rgba(255,255,255,0.04); padding: 4px 8px; border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.08); margin-bottom: 6px;
+        }
+        .reserve-row .order-num { font-size: 16pt; font-style: normal; background: #333; color: #aaa; height: 38px; }
+
+        .bottom-action-area { display: flex; gap: 15px; margin-top: 15px; justify-content: center; width: 100%; }
+        button { font-size: 16pt; padding: 10px 25px; font-weight: bold; color: #fff; border: none; border-radius: 8px; cursor: pointer; background: #4A148C; transition: 0.3s; }
+        #share-line-btn { background: #06C755; }
     </style>
 </head>
 <body>
 
 <div id="capture-area">
     <div class="main-container">
-        <div class="header">
-            <img src="https://lh3.googleusercontent.com/d/1aooCsOuMMtwMhT5bay4kDQCAq9sbm3kW" crossorigin="anonymous">
-            <h1>🔥 攻 守 名 單 🔥</h1>
+        <div class="header-container">
+            <img class="header-logo" src="https://lh3.googleusercontent.com/d/1aooCsOuMMtwMhT5bay4kDQCAq9sbm3kW" crossorigin="anonymous">
+            <div class="header-title">🔥 攻 守 名 單 🔥</div>
         </div>
-
-        <div class="info-board">
-            <div class="info-group"><label>日期：</label><input type="date" id="g-date"></div>
-            <div class="info-group"><label>集合：</label><input type="time" value="08:30"></div>
-            <div class="info-group"><label>比賽：</label><input type="time" value="10:00"></div>
-            <div class="info-group"><label>地點：</label><select id="g-location"><option value="">選擇...</option></select></div>
-            <div class="info-group"><label>休息區：</label>
-                <select id="g-side">
+        
+        <div class="game-info-grid">
+            <div class="info-cell"><span>日期：</span><input type="date" id="game-date"></div>
+            <div class="info-cell"><span>集合：</span><input type="time" value="08:30"></div>
+            <div class="info-cell"><span>比賽：</span><input type="time" value="10:00"></div>
+            
+            <div class="info-cell"><span>地點：</span><select id="game-location"><option value="">選擇...</option></select></div>
+            <div class="info-cell">
+                <span>休息區：</span>
+                <select id="bench-side">
                     <option value="">選擇...</option>
                     <option value="一壘側">一壘側</option>
                     <option value="三壘側">三壘側</option>
                 </select>
             </div>
-            <div class="info-group"><label>對戰：</label><input type="text" placeholder="對手名稱"></div>
+            <div class="info-cell"><span>對戰：</span><input type="text" placeholder="對手名稱..."></div>
         </div>
 
-        <div class="content-split">
-            <div class="starters-section">
-                <div class="section-title">⚾ 先發名單</div>
-                <div class="list-container" id="starters-list"></div>
-                
-                <div class="list-container" style="margin-top: 6px;">
-                    <div class="row-item" id="p-row">
-                        <div class="pos-tag" style="background:#311b92;">P</div>
+        <div class="roster-split">
+            <div class="starters-col">
+                <div class="lineup-list" id="starters-board"></div>
+                <div class="lineup-list" style="margin-top: 6px;">
+                    <div class="lineup-row" id="sp-row">
+                        <div class="order-num" style="background:#311B92;">P</div>
                         <select class="player-select"><option value="">-- 球員 --</option></select>
-                        <div class="jersey-num"></div>
+                        <div class="jersey-num-circle"></div>
                         <select class="pos-select" disabled><option>P (1)</option></select>
                     </div>
                 </div>
             </div>
-
-            <div class="bench-section">
-                <div class="section-title">🛡️ 預備球員</div>
-                <div class="list-container" id="bench-list"></div>
+            <div class="bench-col">
+                <div id="reserves-board"></div>
             </div>
         </div>
 
-        <div class="actions">
-            <button class="btn" id="btn-download">📸 下載圖檔</button>
-            <button class="btn btn-line" id="btn-line">🟢 分享至 LINE</button>
+        <div class="bottom-action-area">
+            <button id="export-btn">📸 下載圖檔</button>
+            <button id="share-line-btn">🟢 分享至 LINE</button>
         </div>
     </div>
 </div>
 
 <script>
-    document.getElementById('g-date').value = new Date().toISOString().split('T')[0];
-    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQE8qU7MUo8mltMrnQSLttK1ePGuN2ooTaD3QBtoKsmvrW5tEKOjSXwGm9bwhZtgy2veLF-QLTpe33q/pub?output=csv";
-    let dbPlayers = [];
-    
-    /* 守位代碼間隔一個字元寬度修正 */
-    const positions = ["C (2)", "1B (3)", "2B (4)", "3B (5)", "SS (6)", "LF (7)", "CF (8)", "RF (9)", "DH"];
+    document.getElementById('game-date').value = new Date().toISOString().split('T')[0];
+    const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQE8qU7MUo8mltMrnQSLttK1ePGuN2ooTaD3QBtoKsmvrW5tEKOjSXwGm9bwhZtgy2veLF-QLTpe33q/pub?output=csv";
+    let playersData = [];
+    /* 🌟 守位與代碼間隔 1 個字元寬度 🌟 */
+    const posList = ["C (2)", "1B (3)", "2B (4)", "3B (5)", "SS (6)", "LF (7)", "CF (8)", "RF (9)", "DH"];
 
-    function buildRow(num, mode, box) {
-        const div = document.createElement('div');
-        div.className = mode === 'bench' ? 'bench-item' : 'row-item';
-        
-        if (mode === 'starter') {
-            /* 🌟 [棒次] -> [球員姓名] -> [背號] -> [守位(代碼)] 🌟 */
-            div.innerHTML = `
-                <div class="pos-tag">${num}棒</div>
+    function createRow(index, type, container) {
+        const row = document.createElement('div');
+        row.className = type === 'reserve' ? 'reserve-row' : 'lineup-row';
+        if (type === 'starter') {
+            /* 🌟 對調後的正確順序：棒次 -> 姓名灰框 -> 圓圈背號 -> 守位灰框 🌟 */
+            row.innerHTML = `
+                <div class="order-num">${index}棒</div>
                 <select class="player-select"><option value="">-- 球員 --</option></select>
-                <div class="jersey-num"></div>
+                <div class="jersey-num-circle"></div>
                 <select class="pos-select">
                     <option value="">守位</option>
-                    ${positions.map(p => `<option value="${p}">${p}</option>`).join('')}
+                    ${posList.map(p => `<option value="${p}">${p}</option>`).join('')}
                 </select>`;
         } else {
-            div.innerHTML = `
-                <div class="pos-tag">預</div>
+            row.innerHTML = `
+                <div class="order-num">預</div>
                 <select class="player-select"><option value="">-- 球員 --</option></select>
-                <div class="jersey-num"></div>`;
+                <div class="jersey-num-circle"></div>`;
         }
 
-        const sel = div.querySelector('.player-select');
-        const jerseyNum = div.querySelector('.jersey-num');
-        
-        sel.addEventListener('change', () => {
-            const matched = dbPlayers.find(p => p.name === sel.value);
-            if (matched && matched.num) {
-                jerseyNum.textContent = '#' + matched.num;
-                jerseyNum.classList.add('active');
-            } else {
-                jerseyNum.textContent = '';
-                jerseyNum.classList.remove('active');
-            }
+        const pSelect = row.querySelector('.player-select');
+        const jerseyCirc = row.querySelector('.jersey-num-circle');
+        pSelect.addEventListener('change', () => {
+            const p = playersData.find(x => x.name === pSelect.value);
+            if (p && p.num) { jerseyCirc.textContent = p.num; jerseyCirc.classList.add('active'); }
+            else { jerseyCirc.textContent = ''; jerseyCirc.classList.remove('active'); }
         });
-        box.appendChild(div);
+        container.appendChild(row);
     }
 
-    for (let i = 1; i <= 9; i++) buildRow(i, 'starter', document.getElementById('starters-list'));
-    for (let i = 1; i <= 8; i++) buildRow(i, 'bench', document.getElementById('bench-list'));
+    for (let i = 1; i <= 9; i++) createRow(i, 'starter', document.getElementById('starters-board'));
+    for (let i = 1; i <= 8; i++) createRow(i, 'reserve', document.getElementById('reserves-board'));
 
-    // 處理投手專區背號
-    const pSel = document.querySelector('#p-row .player-select');
-    const pJersey = document.querySelector('#p-row .jersey-num');
+    // 處理投手行背號
+    const pSel = document.querySelector('#sp-row .player-select');
+    const pCirc = document.querySelector('#sp-row .jersey-num-circle');
     pSel.addEventListener('change', () => {
-        const matched = dbPlayers.find(p => p.name === pSel.value);
-        if (matched && matched.num) { pJersey.textContent = '#' + matched.num; pJersey.classList.add('active'); }
-        else { pJersey.textContent = ''; pJersey.classList.remove('active'); }
+        const p = playersData.find(x => x.name === pSel.value);
+        if (p && p.num) { pCirc.textContent = p.num; pCirc.classList.add('active'); }
+        else { pCirc.textContent = ''; pCirc.classList.remove('active'); }
     });
 
-    Papa.parse(SHEET_URL, {
+    Papa.parse(GOOGLE_SHEET_URL, {
         download: true,
-        complete: function(res) {
-            const rows = res.data.slice(1);
-            dbPlayers = rows.map(r => ({ num: String(r[0]||"").trim(), name: String(r[1]||"").trim() })).filter(p => p.name !== "");
-            const locs = Array.from(new Set(rows.map(r => String(r[2]||"").trim()))).filter(l => l !== "");
-            
-            document.getElementById('g-location').innerHTML = '<option value="">選擇...</option>' + locs.map(l => `<option value="${l}">${l}</option>`).join('');
-            document.querySelectorAll('.player-select').forEach(s => {
-                dbPlayers.forEach(p => {
-                    const o = document.createElement('option');
-                    o.value = p.name; o.textContent = p.name;
-                    s.appendChild(o);
-                });
+        complete: function(results) {
+            const data = results.data.slice(1);
+            playersData = data.map(row => ({ num: String(row[0]||"").trim(), name: String(row[1]||"").trim() })).filter(p => p.name !== "");
+            const locations = Array.from(new Set(data.map(row => String(row[2]||"").trim()))).filter(loc => loc !== "");
+            document.getElementById('game-location').innerHTML = '<option value="">選擇...</option>' + locations.map(loc => `<option value="${loc}">${loc}</option>`).join('');
+            document.querySelectorAll('.player-select').forEach(select => {
+                playersData.forEach(p => { const opt = document.createElement('option'); opt.value = p.name; opt.textContent = p.name; select.appendChild(opt); });
             });
         }
     });
 
-    async function doShare() {
-        const area = document.querySelector('.actions');
-        area.style.display = 'none';
-        const cvs = await html2canvas(document.getElementById('capture-area'), { scale: 2, useCORS: true });
-        area.style.display = 'flex';
-        cvs.toBlob(b => {
-            const f = new File([b], 'Lineup.png', { type: 'image/png' });
-            if (navigator.canShare && navigator.canShare({ files: [f] })) navigator.share({ files: [f] });
-            else { const a = document.createElement('a'); a.download = 'Lineup.png'; a.href = URL.createObjectURL(b); a.click(); }
+    async function handleShare() {
+        const btns = document.querySelector('.bottom-action-area');
+        btns.style.display = 'none';
+        const canvas = await html2canvas(document.getElementById('capture-area'), { scale: 2, useCORS: true });
+        btns.style.display = 'flex';
+        canvas.toBlob(blob => {
+            const file = new File([blob], 'JZ_Lineup.png', { type: 'image/png' });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file] });
+            else { const link = document.createElement('a'); link.download = 'JZ_Lineup.png'; link.href = URL.createObjectURL(blob); link.click(); }
         });
     }
-    document.getElementById('btn-download').onclick = doShare;
-    document.getElementById('btn-line').onclick = doShare;
+    document.getElementById('export-btn').onclick = handleShare;
+    document.getElementById('share-line-btn').onclick = handleShare;
 </script>
 </body>
 </html>
