@@ -1,16 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - 攻守名單 (灰框對調版)</title>
+    <title>JZ BASEBALL TEAM - 攻守名單</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700;400&display=swap');
 
-        body { font-family: '微軟正黑體', Arial, sans-serif; background: #111; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; min-height: 100vh; color: #fff; }
+        body { font-family: '微軟正黑體', Arial, sans-serif; background: #111; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; color: #fff; }
 
         #capture-area {
             width: 756px; height: auto; 
@@ -39,7 +38,7 @@
             letter-spacing: 3px; text-shadow: 0 0 10px rgba(179,136,255,0.5);
         }
 
-        /* 比賽資訊列：背景完美包覆 */
+        /* 資訊列設定 - 寬度完美包覆不溢出 */
         .game-info-grid { 
             display: grid; grid-template-columns: 1fr 1fr 1fr; 
             gap: 12px; margin-bottom: 15px; 
@@ -54,6 +53,7 @@
             border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 3px;
             line-height: 1.4;
         }
+        select option { background: #fff; color: #000; font-size: 14pt; }
 
         /* 日曆與時鐘圖示深紫色 */
         input[type="date"]::-webkit-calendar-picker-indicator,
@@ -68,16 +68,16 @@
 
         .lineup-list { display: flex; flex-direction: column; gap: 6px; }
         
-        /* 🌟 經典灰框版單列排版 🌟 */
+        /* 🌟 先發名單網格修正：[棒次(55px)] -> [守位(80px)] -> [球員姓名(159px)] -> [背號(1fr)] 🌟 */
         .lineup-row { 
             display: grid; 
-            grid-template-columns: 55px 159px 55px 1fr; 
+            grid-template-columns: 55px 80px 159px 1fr; 
             align-items: center; gap: 12px; 
             background: rgba(255,255,255,0.04); padding: 4px 10px; border-radius: 6px;
             border: 1px solid rgba(255,255,255,0.08);
         } 
         
-        /* 所有文字統一為 18pt */
+        /* 所有文字與元件統一為 18pt */
         .order-num { 
             background: #4A148C; color: #fff; font-family: 'Oswald', sans-serif; 
             font-size: 18pt; font-style: italic; 
@@ -86,47 +86,40 @@
             border-radius: 4px;
         }
 
-        /* 🌟 經典灰框/白框輸入框與點開選單黑字 🌟 */
-        .player-select { 
-            -webkit-appearance: none; appearance: none; 
-            background: #f5f5f5; border: 1px solid #ccc; 
-            color: #000; font-size: 18pt; font-weight: bold; outline: none; 
-            width: 100%; height: 38px; line-height: 38px;
-            padding: 0 5px; border-radius: 4px;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-            cursor: pointer; box-sizing: border-box;
-        }
-        .player-select option { background: #fff; color: #000; font-size: 14pt; }
-
-        /* 經典紫色圓圈背號：精準對齊上方「休息區」的「休」字下方 */
-        .jersey-num-circle { 
-            width: 38px; height: 38px; border-radius: 50%;
-            background: #311b92; color: #b388ff;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 18pt; font-family: 'Oswald', sans-serif; font-weight: bold;
-            opacity: 0; transition: 0.2s; justify-self: center;
-        }
-        .jersey-num-circle.active { opacity: 1; }
-
-        /* 🌟 經典灰框守位選單 (已對調至最右側) 🌟 */
         .pos-select {
             -webkit-appearance: none; appearance: none;
-            background: #f5f5f5; border: 1px solid #ccc;
-            color: #4A148C; font-family: 'Oswald', sans-serif; font-size: 18pt; font-weight: bold;
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+            color: #B89947; font-family: 'Oswald', sans-serif; font-size: 18pt; font-weight: bold;
             width: 100%; height: 38px; border-radius: 4px; text-align: center; cursor: pointer; outline: none;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); box-sizing: border-box;
         }
-        .pos-select option { background: #fff; color: #000; }
 
-        /* 預備球員專用 Grid (寬度足夠容納 8 字元) */
+        .player-select { 
+            -webkit-appearance: none; appearance: none; 
+            background: transparent; border: none; 
+            color: #fff; font-size: 18pt; font-weight: bold; outline: none; 
+            width: 100%; height: 38px; line-height: 38px;
+            padding: 0; text-shadow: 1px 1px 2px #000;
+            cursor: pointer;
+        }
+
+        .jersey-num { 
+            font-family: 'Oswald', sans-serif; font-size: 18pt; 
+            color: #B388FF; font-style: italic; 
+            opacity: 0; transition: 0.3s; 
+            text-align: center;
+        }
+        .jersey-num.active { opacity: 1; }
+
+        /* 預備球員專用 Grid：[序號] -> [球員姓名] -> [背號] */
         .reserve-row { 
             display: grid; 
-            grid-template-columns: 45px 1fr 55px; 
+            grid-template-columns: 45px 159px 55px; 
             align-items: center; gap: 10px; 
             background: rgba(255,255,255,0.04); padding: 4px 8px; border-radius: 6px;
             border: 1px solid rgba(255,255,255,0.08); margin-bottom: 6px;
         }
         .reserve-row .order-num { font-size: 16pt; font-style: normal; background: #333; color: #aaa; height: 38px; }
+        .reserve-row .player-select, .reserve-row .jersey-num { font-size: 18pt; }
 
         .bottom-action-area { display: flex; gap: 15px; margin-top: 15px; justify-content: center; width: 100%; }
         button { font-size: 16pt; padding: 10px 25px; font-weight: bold; color: #fff; border: none; border-radius: 8px; cursor: pointer; background: #4A148C; transition: 0.3s; }
@@ -144,16 +137,16 @@
         
         <div class="game-info-grid">
             <div class="info-cell"><span>日期：</span><input type="date" id="game-date"></div>
-            <div class="info-cell"><span>集合：</span><input type="time" value="08:30"></div>
-            <div class="info-cell"><span>比賽：</span><input type="time" value="10:00"></div>
+            <div class="info-cell"><span>集合：</span><input type="time" value="08:00"></div>
+            <div class="info-cell"><span>比賽：</span><input type="time" value="09:00"></div>
             
             <div class="info-cell"><span>地點：</span><select id="game-location"><option value="">選擇...</option></select></div>
             <div class="info-cell">
                 <span>休息區：</span>
                 <select id="bench-side">
                     <option value="">選擇...</option>
-                    <option value="一壘側">一壘側</option>
-                    <option value="三壘側">三壘側</option>
+                    <option value="一壘側(先攻)">一壘側(先攻)</option>
+                    <option value="三壘側(先守)">三壘側(先守)</option>
                 </select>
             </div>
             <div class="info-cell"><span>對戰：</span><input type="text" placeholder="對手名稱..."></div>
@@ -165,9 +158,9 @@
                 <div class="lineup-list" style="margin-top: 6px;">
                     <div class="lineup-row" id="sp-row">
                         <div class="order-num" style="background:#311B92;">P</div>
-                        <select class="player-select"><option value="">-- 球員 --</option></select>
-                        <div class="jersey-num-circle"></div>
                         <select class="pos-select" disabled><option>P (1)</option></select>
+                        <select class="player-select"><option value="">-- 球員 --</option></select>
+                        <div class="jersey-num"></div>
                     </div>
                 </div>
             </div>
@@ -187,22 +180,77 @@
     document.getElementById('game-date').value = new Date().toISOString().split('T')[0];
     const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQE8qU7MUo8mltMrnQSLttK1ePGuN2ooTaD3QBtoKsmvrW5tEKOjSXwGm9bwhZtgy2veLF-QLTpe33q/pub?output=csv";
     let playersData = [];
-    /* 🌟 守位與代碼間隔 1 個字元寬度 🌟 */
+    /* 守位與代碼間隔 1 個字元寬度 */
     const posList = ["C (2)", "1B (3)", "2B (4)", "3B (5)", "SS (6)", "LF (7)", "CF (8)", "RF (9)", "DH"];
 
     function createRow(index, type, container) {
         const row = document.createElement('div');
         row.className = type === 'reserve' ? 'reserve-row' : 'lineup-row';
         if (type === 'starter') {
-            /* 🌟 對調後的正確順序：棒次 -> 姓名灰框 -> 圓圈背號 -> 守位灰框 🌟 */
+            /* 🌟 [棒次] -> [守位+代號] -> [球員姓名] -> [背號] 🌟 */
             row.innerHTML = `
                 <div class="order-num">${index}棒</div>
-                <select class="player-select"><option value="">-- 球員 --</option></select>
-                <div class="jersey-num-circle"></div>
                 <select class="pos-select">
                     <option value="">守位</option>
                     ${posList.map(p => `<option value="${p}">${p}</option>`).join('')}
-                </select>`;
+                </select>
+                <select class="player-select"><option value="">-- 球員 --</option></select>
+                <div class="jersey-num"></div>`;
         } else {
             row.innerHTML = `
                 <div class="order-num">預</div>
+                <select class="player-select"><option value="">-- 球員 --</option></select>
+                <div class="jersey-num"></div>`;
+        }
+
+        const pSelect = row.querySelector('.player-select');
+        const jerseyNum = row.querySelector('.jersey-num');
+        pSelect.addEventListener('change', () => {
+            const p = playersData.find(x => x.name === pSelect.value);
+            if (p && p.num) { jerseyNum.textContent = '#' + p.num; jerseyNum.classList.add('active'); }
+            else { jerseyNum.textContent = ''; jerseyNum.classList.remove('active'); }
+        });
+        container.appendChild(row);
+    }
+
+    for (let i = 1; i <= 9; i++) createRow(i, 'starter', document.getElementById('starters-board'));
+    for (let i = 1; i <= 8; i++) createRow(i, 'reserve', document.getElementById('reserves-board'));
+
+    // 處理投手專區背號連動
+    const pSel = document.querySelector('#sp-row .player-select');
+    const pJersey = document.querySelector('#sp-row .jersey-num');
+    pSel.addEventListener('change', () => {
+        const p = playersData.find(x => x.name === pSel.value);
+        if (p && p.num) { pJersey.textContent = '#' + p.num; pJersey.classList.add('active'); }
+        else { pJersey.textContent = ''; pJersey.classList.remove('active'); }
+    });
+
+    Papa.parse(GOOGLE_SHEET_URL, {
+        download: true,
+        complete: function(results) {
+            const data = results.data.slice(1);
+            playersData = data.map(row => ({ num: String(row[0]||"").trim(), name: String(row[1]||"").trim() })).filter(p => p.name !== "");
+            const locations = Array.from(new Set(data.map(row => String(row[2]||"").trim()))).filter(loc => loc !== "");
+            document.getElementById('game-location').innerHTML = '<option value="">選擇...</option>' + locations.map(loc => `<option value="${loc}">${loc}</option>`).join('');
+            document.querySelectorAll('.player-select').forEach(select => {
+                playersData.forEach(p => { const opt = document.createElement('option'); opt.value = p.name; opt.textContent = p.name; select.appendChild(opt); });
+            });
+        }
+    });
+
+    async function handleShare() {
+        const btns = document.querySelector('.bottom-action-area');
+        btns.style.display = 'none';
+        const canvas = await html2canvas(document.getElementById('capture-area'), { scale: 2, useCORS: true });
+        btns.style.display = 'flex';
+        canvas.toBlob(blob => {
+            const file = new File([blob], 'JZ_Lineup.png', { type: 'image/png' });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file] });
+            else { const link = document.createElement('a'); link.download = 'JZ_Lineup.png'; link.href = URL.createObjectURL(blob); link.click(); }
+        });
+    }
+    document.getElementById('export-btn').onclick = handleShare;
+    document.getElementById('share-line-btn').onclick = handleShare;
+</script>
+</body>
+</html>
