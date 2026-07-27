@@ -106,4 +106,158 @@
             cursor: pointer;
         }
 
-        /* 2.
+        /* 2. 背號：移除 # 號，改為紫色圓圈背景 + 金色數字 */
+        .jersey-num { 
+            font-family: 'Oswald', sans-serif; font-size: 18pt; font-weight: bold;
+            color: #B89947; /* 金色數字 */
+            background-color: #311B92; /* 深紫色圓圈 */
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: 0.3s; 
+            box-shadow: 0 0 4px rgba(0,0,0,0.5);
+            justify-self: center;
+        }
+        .jersey-num.active { opacity: 1; }
+
+        /* 預備球員網格 */
+        .reserve-row { 
+            display: grid; 
+            grid-template-columns: 45px 170px 42px; 
+            align-items: center; gap: 10px; 
+            background: rgba(255,255,255,0.04); padding: 4px 10px; border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.08); margin-bottom: 6px;
+        }
+        .reserve-row .order-num { font-size: 16pt; font-style: normal; background: #333; color: #aaa; height: 38px; }
+        .reserve-row .player-select { width: 170px; font-size: 18pt; }
+
+        .bottom-action-area { display: flex; gap: 15px; margin-top: 20px; justify-content: center; width: 100%; }
+        button { font-size: 16pt; padding: 10px 25px; font-weight: bold; color: #fff; border: none; border-radius: 8px; cursor: pointer; background: #4A148C; transition: 0.3s; }
+        #share-line-btn { background: #06C755; }
+    </style>
+</head>
+<body>
+
+<div id="capture-area">
+    <div class="main-container">
+        <div class="header-container">
+            <img class="header-logo" src="https://lh3.googleusercontent.com/d/1aooCsOuMMtwMhT5bay4kDQCAq9sbm3kW" crossorigin="anonymous">
+            <div class="header-title">🔥 攻 守 名 單 🔥</div>
+        </div>
+        
+        <div class="game-info-grid">
+            <div class="info-cell"><span>日期：</span><input type="date" id="game-date"></div>
+            <div class="info-cell"><span>集合：</span><input type="time" value="08:00"></div>
+            <div class="info-cell"><span>比賽：</span><input type="time" value="09:00"></div>
+            
+            <div class="info-cell"><span>地點：</span><select id="game-location"><option value="">選擇...</option></select></div>
+            <div class="info-cell">
+                <span>休息區：</span>
+                <select id="bench-side">
+                    <option value="">選擇...</option>
+                    <option value="一壘側(先攻)">一壘側(先攻)</option>
+                    <option value="三壘側(先守)">三壘側(先守)</option>
+                </select>
+            </div>
+            <div class="info-cell"><span>對戰：</span><input type="text" placeholder="對手名稱..."></div>
+        </div>
+
+        <div class="roster-split">
+            <div class="starters-col">
+                <div class="lineup-list" id="starters-board"></div>
+                <div class="lineup-list" style="margin-top: 6px;">
+                    <div class="lineup-row" id="sp-row">
+                        <div class="order-num" style="background:#311B92;">P</div>
+                        <select class="pos-select" disabled><option>P (1)</option></select>
+                        <select class="player-select"><option value="">-- 球員 --</option></select>
+                        <div class="jersey-num"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bench-col">
+                <div id="reserves-board"></div>
+            </div>
+        </div>
+
+        <div class="bottom-action-area">
+            <button id="export-btn">📸 下載圖檔</button>
+            <button id="share-line-btn">🟢 分享至 LINE</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('game-date').value = new Date().toISOString().split('T')[0];
+    const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQE8qU7MUo8mltMrnQSLttK1ePGuN2ooTaD3QBtoKsmvrW5tEKOjSXwGm9bwhZtgy2veLF-QLTpe33q/pub?output=csv";
+    let playersData = [];
+    const posList = ["C (2)", "1B (3)", "2B (4)", "3B (5)", "SS (6)", "LF (7)", "CF (8)", "RF (9)", "DH"];
+
+    function createRow(index, type, container) {
+        const row = document.createElement('div');
+        row.className = type === 'reserve' ? 'reserve-row' : 'lineup-row';
+        if (type === 'starter') {
+            row.innerHTML = `
+                <div class="order-num">${index}棒</div>
+                <select class="pos-select">
+                    <option value="">守位</option>
+                    ${posList.map(p => `<option value="${p}">${p}</option>`).join('')}
+                </select>
+                <select class="player-select"><option value="">-- 球員 --</option></select>
+                <div class="jersey-num"></div>`;
+        } else {
+            row.innerHTML = `
+                <div class="order-num">預</div>
+                <select class="player-select"><option value="">-- 球員 --</option></select>
+                <div class="jersey-num"></div>`;
+        }
+
+        const pSelect = row.querySelector('.player-select');
+        const jerseyNum = row.querySelector('.jersey-num');
+        pSelect.addEventListener('change', () => {
+            const p = playersData.find(x => x.name === pSelect.value);
+            if (p && p.num) { jerseyNum.textContent = p.num; jerseyNum.classList.add('active'); }
+            else { jerseyNum.textContent = ''; jerseyNum.classList.remove('active'); }
+        });
+        container.appendChild(row);
+    }
+
+    for (let i = 1; i <= 9; i++) createRow(i, 'starter', document.getElementById('starters-board'));
+    for (let i = 1; i <= 8; i++) createRow(i, 'reserve', document.getElementById('reserves-board'));
+
+    const pSel = document.querySelector('#sp-row .player-select');
+    const pJersey = document.querySelector('#sp-row .jersey-num');
+    pSel.addEventListener('change', () => {
+        const p = playersData.find(x => x.name === pSel.value);
+        if (p && p.num) { pJersey.textContent = p.num; pJersey.classList.add('active'); }
+        else { pJersey.textContent = ''; pJersey.classList.remove('active'); }
+    });
+
+    Papa.parse(GOOGLE_SHEET_URL, {
+        download: true,
+        complete: function(results) {
+            const data = results.data.slice(1);
+            playersData = data.map(row => ({ num: String(row[0]||"").trim(), name: String(row[1]||"").trim() })).filter(p => p.name !== "");
+            const locations = Array.from(new Set(data.map(row => String(row[2]||"").trim()))).filter(loc => loc !== "");
+            document.getElementById('game-location').innerHTML = '<option value="">選擇...</option>' + locations.map(loc => `<option value="${loc}">${loc}</option>`).join('');
+            document.querySelectorAll('.player-select').forEach(select => {
+                playersData.forEach(p => { const opt = document.createElement('option'); opt.value = p.name; opt.textContent = p.name; select.appendChild(opt); });
+            });
+        }
+    });
+
+    async function handleShare() {
+        const btns = document.querySelector('.bottom-action-area');
+        btns.style.display = 'none';
+        const canvas = await html2canvas(document.getElementById('capture-area'), { scale: 2, useCORS: true });
+        btns.style.display = 'flex';
+        canvas.toBlob(blob => {
+            const file = new File([blob], 'JZ_Lineup.png', { type: 'image/png' });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file] });
+            else { const link = document.createElement('a'); link.download = 'JZ_Lineup.png'; link.href = URL.createObjectURL(blob); link.click(); }
+        });
+    }
+    document.getElementById('export-btn').onclick = handleShare;
+    document.getElementById('share-line-btn').onclick = handleShare;
+</script>
+</body>
+</html>
