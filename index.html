@@ -11,7 +11,6 @@
 
         * { box-sizing: border-box; }
 
-        /* 🌟 Google Sites 專用 reset：強制移除 body 邊距與水平滾動條 */
         html, body {
             margin: 0;
             padding: 0;
@@ -27,58 +26,59 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            padding: 10px 5px;
+            padding: 5px;
         }
 
-        /* 🌟 滿版彈性適應：自適應 100% 寬度，最大 920px */
+        /* 🌟 主畫布：大幅縮減內距 (12px) 節省垂直空間 */
         #capture-area {
             width: 100%;
-            max-width: 920px;
+            max-width: 900px;
             height: auto; 
             background-color: #0f081d;
             background-image: radial-gradient(circle at 50% 20%, #231249 0%, #0c0518 85%);
             display: flex; position: relative; overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.9);
-            padding: 20px;
-            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.9);
+            padding: 12px 18px;
+            border-radius: 10px;
             border: 1px solid rgba(179, 136, 255, 0.2);
         }
 
         .main-container { width: 100%; display: flex; flex-direction: column; position: relative; z-index: 2; }
 
+        /* 🌟 表頭緊緻化：LOGO (50px)、標題 (22pt)、下邊距縮窄 */
         .header-container {
-            display: flex; justify-content: center; align-items: center; gap: 18px;
-            margin-bottom: 15px; border-bottom: 2px solid rgba(244, 208, 63, 0.4); padding-bottom: 12px;
+            display: flex; justify-content: center; align-items: center; gap: 12px;
+            margin-bottom: 8px; border-bottom: 2px solid rgba(244, 208, 63, 0.4); padding-bottom: 6px;
         }
         
         .header-logo { 
-            width: 75px; height: 75px; 
+            width: 50px; height: 50px; 
             object-fit: contain; 
             border-radius: 50%;
-            filter: drop-shadow(0 0 10px rgba(244, 208, 63, 0.7));
+            filter: drop-shadow(0 0 8px rgba(244, 208, 63, 0.7));
         }
         
         .header-title { 
-            font-family: 'Oswald', sans-serif; font-size: 28pt; font-weight: bold; color: #fff; 
-            letter-spacing: 4px; text-shadow: 0 0 12px rgba(179,136,255,0.6);
+            font-family: 'Oswald', sans-serif; font-size: 22pt; font-weight: bold; color: #fff; 
+            letter-spacing: 3px; text-shadow: 0 0 10px rgba(179,136,255,0.6);
         }
 
-        /* 比賽資訊區 */
+        /* 🌟 比賽資訊區緊緻化 */
         .game-info-grid { 
             display: grid; grid-template-columns: repeat(3, 1fr); 
-            gap: 15px; margin-bottom: 20px; 
-            width: 100%; padding: 10px 0; background: transparent; border: none;
+            gap: 6px 12px; margin-bottom: 10px; 
+            width: 100%; padding: 0; background: transparent; border: none;
         }
-        .info-cell { display: flex; align-items: center; gap: 6px; font-size: 18pt; color: #eee; min-height: 40px; min-width: 0; }
-        .info-cell span { font-weight: bold; color: #F4D03F; white-space: nowrap; font-size: 18pt; flex-shrink: 0; text-shadow: 1px 1px 3px #000; }
+        .info-cell { display: flex; align-items: center; gap: 4px; font-size: 16pt; color: #eee; min-height: 32px; min-width: 0; }
+        .info-cell span { font-weight: bold; color: #F4D03F; white-space: nowrap; font-size: 16pt; flex-shrink: 0; text-shadow: 1px 1px 3px #000; }
         
         .game-info-grid input, .game-info-grid select { 
-            background: transparent; border: none; color: #fff; font-size: 18pt; font-weight: bold; outline: none; cursor: pointer; 
+            background: transparent; border: none; color: #fff; font-size: 16pt; font-weight: bold; outline: none; cursor: pointer; 
             width: 100%; min-width: 0;
-            border-bottom: 2px solid rgba(244, 208, 63, 0.5); padding-bottom: 3px;
-            line-height: 1.4; text-shadow: 1px 1px 3px #000;
+            border-bottom: 1.5px solid rgba(244, 208, 63, 0.5); padding-bottom: 2px;
+            line-height: 1.2; text-shadow: 1px 1px 3px #000;
         }
-        select option { background: #1c0e36; color: #fff; font-size: 14pt; }
+        select option { background: #1c0e36; color: #fff; font-size: 13pt; }
 
         input[type="date"]::-webkit-calendar-picker-indicator,
         input[type="time"]::-webkit-calendar-picker-indicator {
@@ -86,26 +86,28 @@
             cursor: pointer; opacity: 1;
         }
 
-        .roster-split { display: flex; gap: 15px; width: 100%; }
+        .roster-split { display: flex; gap: 12px; width: 100%; }
         .starters-col { width: 57%; display: flex; flex-direction: column; }
         .bench-col { width: 43%; display: flex; flex-direction: column; }
 
-        .lineup-list { display: flex; flex-direction: column; gap: 8px; }
+        /* 🌟 名單垂直間距緊縮 */
+        .lineup-list { display: flex; flex-direction: column; gap: 5px; }
         
+        /* 🌟 先發單列高度降至 42px */
         .lineup-row { 
             display: grid; 
-            grid-template-columns: 50px 75px 1fr 40px; 
-            align-items: center; gap: 10px; 
-            background: rgba(255, 255, 255, 0.08); padding: 5px 12px; border-radius: 6px;
+            grid-template-columns: 45px 65px 1fr 34px; 
+            align-items: center; gap: 8px; 
+            background: rgba(255, 255, 255, 0.08); padding: 3px 10px; border-radius: 5px;
             border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-            height: 50px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            height: 42px;
         } 
         
         .order-num { 
             background: #5e1d96; color: #fff; font-family: 'Oswald', sans-serif; 
-            font-size: 18pt; font-style: italic; font-weight: bold;
-            height: 38px; width: 50px;
+            font-size: 15pt; font-style: italic; font-weight: bold;
+            height: 32px; width: 45px;
             display: flex; justify-content: center; align-items: center; 
             border-radius: 4px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
@@ -114,8 +116,8 @@
         .pos-select {
             -webkit-appearance: none; appearance: none;
             background: transparent; border: none; 
-            color: #F4D03F; font-family: 'Oswald', sans-serif; font-size: 16pt; font-weight: bold;
-            width: 100%; height: 38px; text-align: center; cursor: pointer; outline: none;
+            color: #F4D03F; font-family: 'Oswald', sans-serif; font-size: 15pt; font-weight: bold;
+            width: 100%; height: 32px; text-align: center; cursor: pointer; outline: none;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
         }
         .pos-select option { background: #1c0e36; color: #F4D03F; }
@@ -123,39 +125,41 @@
         .player-select { 
             -webkit-appearance: none; appearance: none; 
             background: transparent; border: none; 
-            color: #fff; font-size: 18pt; font-weight: bold; outline: none; 
-            width: 100%; height: 38px; line-height: 38px;
+            color: #fff; font-size: 16pt; font-weight: bold; outline: none; 
+            width: 100%; height: 32px; line-height: 32px;
             padding: 0; text-shadow: 1px 1px 3px #000;
             cursor: pointer;
         }
 
         .jersey-num { 
-            font-family: 'Oswald', sans-serif; font-size: 18pt; font-weight: bold;
+            font-family: 'Oswald', sans-serif; font-size: 15pt; font-weight: bold;
             color: #ffd700; 
             background: #4a148c; 
             border: 1px solid rgba(255, 215, 0, 0.4);
-            width: 38px; height: 38px; border-radius: 50%;
+            width: 32px; height: 32px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             opacity: 0; transition: 0.3s; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.6);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
             justify-self: end;
         }
         .jersey-num.active { opacity: 1; }
 
+        /* 🌟 預備球員單列同步縮至 42px */
         .reserve-row { 
             display: grid; 
-            grid-template-columns: 50px 1fr 40px; 
-            align-items: center; gap: 10px; 
-            background: rgba(255, 255, 255, 0.08); padding: 5px 12px; border-radius: 6px;
+            grid-template-columns: 45px 1fr 34px; 
+            align-items: center; gap: 8px; 
+            background: rgba(255, 255, 255, 0.08); padding: 3px 10px; border-radius: 5px;
             border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-            height: 50px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            height: 42px;
         }
-        .reserve-row .order-num { font-size: 16pt; font-style: italic; background: #333; color: #bbb; }
-        .reserve-row .player-select { width: 100%; font-size: 18pt; }
+        .reserve-row .order-num { font-size: 14pt; font-style: italic; background: #333; color: #bbb; }
+        .reserve-row .player-select { width: 100%; font-size: 16pt; }
 
-        .bottom-action-area { display: flex; gap: 15px; margin-top: 20px; justify-content: center; width: 100%; }
-        button { font-size: 16pt; padding: 12px 28px; font-weight: bold; color: #fff; border: none; border-radius: 8px; cursor: pointer; background: #5e1d96; transition: 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        /* 🌟 底部按鈕區縮邊 */
+        .bottom-action-area { display: flex; gap: 12px; margin-top: 10px; justify-content: center; width: 100%; }
+        button { font-size: 14pt; padding: 8px 22px; font-weight: bold; color: #fff; border: none; border-radius: 6px; cursor: pointer; background: #5e1d96; transition: 0.3s; box-shadow: 0 3px 8px rgba(0,0,0,0.5); }
         button:hover { background: #7b2cbf; }
         #share-line-btn { background: #06C755; }
     </style>
@@ -189,7 +193,7 @@
         <div class="roster-split">
             <div class="starters-col">
                 <div class="lineup-list" id="starters-board"></div>
-                <div class="lineup-list" style="margin-top: 8px;">
+                <div class="lineup-list" style="margin-top: 5px;">
                     <div class="lineup-row" id="sp-row">
                         <div class="order-num" style="background:#280b54;">P</div>
                         <select class="pos-select" disabled><option>P (1)</option></select>
