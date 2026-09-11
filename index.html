@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - 攻守名單 V40</title>
+    <title>JZ BASEBALL TEAM - 攻守名單 V41</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -28,14 +28,18 @@
         .main-container { width: 100%; display: flex; flex-direction: column; position: relative; z-index: 2; }
 
         .header-container {
-            display: flex; justify-content: center; align-items: center; gap: 15px;
+            display: flex; justify-content: center; align-items: center; gap: 18px;
             margin-bottom: 15px; border-bottom: 2px solid rgba(244, 208, 63, 0.4); padding-bottom: 12px;
         }
         
-        /* 1. LOGO 修正：使用 CDN 網址，並設置 crossorigin 防跨域封鎖 */
+        /* 🌟 LOGO 強化：去除方形背景 + 放大 25% + 雙層霓虹發光 🌟 */
         .header-logo { 
-            width: 65px; height: 65px; object-fit: contain; 
-            filter: brightness(1.2) drop-shadow(0 0 6px rgba(244, 208, 63, 0.6)); 
+            width: 82px; height: 82px; /* 放大 25% (65px -> 82px) */
+            object-fit: contain; 
+            mix-blend-mode: screen; /* 完美濾除方形黑色背景，只留中間星星 */
+            filter: brightness(1.3) 
+                    drop-shadow(0 0 10px rgba(244, 208, 63, 0.9)) 
+                    drop-shadow(0 0 20px rgba(179, 136, 255, 0.8)); /* 雙層璀璨發光 */
         }
         
         .header-title { 
@@ -43,7 +47,7 @@
             letter-spacing: 4px; text-shadow: 0 0 12px rgba(179,136,255,0.6);
         }
 
-        /* 2. 比賽資訊欄：100% 彈性自適應，徹底解決右側超出背景問題 */
+        /* 比賽資訊欄：彈性自適應防溢出 */
         .game-info-grid { 
             display: grid; grid-template-columns: repeat(3, 1fr); 
             gap: 15px; margin-bottom: 25px; 
@@ -129,7 +133,7 @@
         }
         .jersey-num.active { opacity: 1; }
 
-        /* 3. 預備球員單列：高度 (50px)、尺寸與樣式完全對齊左邊先發球員 */
+        /* 預備球員單列：對齊先發區大小 */
         .reserve-row { 
             display: grid; 
             grid-template-columns: 50px 192px 40px; 
@@ -153,13 +157,13 @@
 
 <div id="capture-area">
     <div class="main-container">
-        <!-- 1. 表頭 LOGO 直連，附帶跨域支援 -->
+        <!-- 表頭 LOGO：去背景 + 放大25% + 發光效果 -->
         <div class="header-container">
             <img class="header-logo" src="https://lh3.googleusercontent.com/d/1aooCsOuMMtwMhT5bay4kDQCAq9sbm3kW" crossorigin="anonymous" alt="Logo">
             <div class="header-title">🔥 攻守名單 🔥</div>
         </div>
         
-        <!-- 2. 比賽資訊區 (完全防止右側溢出) -->
+        <!-- 比賽資訊區 -->
         <div class="game-info-grid">
             <div class="info-cell"><span>日期：</span><input type="date" id="game-date"></div>
             <div class="info-cell"><span>集合：</span><input type="time" value="08:00"></div>
@@ -192,7 +196,7 @@
                 </div>
             </div>
             
-            <!-- 預備區 (3. 對齊先發區大小) -->
+            <!-- 預備區 -->
             <div class="bench-col">
                 <div class="lineup-list" id="reserves-board"></div>
             </div>
