@@ -32,11 +32,13 @@
             margin-bottom: 15px; border-bottom: 2px solid rgba(244, 208, 63, 0.4); padding-bottom: 12px;
         }
         
-        /* 🌟 LOGO 強化：去除方形背景 + 放大 25% + 雙層霓虹發光 🌟 */
+        /* 🌟 LOGO 去除方形背景修復：加上遮罩圓形裁切 🌟 */
         .header-logo { 
-            width: 82px; height: 82px; /* 放大 25% (65px -> 82px) */
-            object-fit: contain; 
-            mix-blend-mode: screen; /* 完美濾除方形黑色背景，只留中間星星 */
+            width: 82px; height: 82px; 
+            object-fit: cover;
+            border-radius: 50%; /* 強制將方形邊框轉為圓形 */
+            clip-path: circle(48% at 50% 50%); /* 徹底切除角落方形黑邊 */
+            mix-blend-mode: screen; /* 濾除內部剩餘深色背景 */
             filter: brightness(1.3) 
                     drop-shadow(0 0 10px rgba(244, 208, 63, 0.9)) 
                     drop-shadow(0 0 20px rgba(179, 136, 255, 0.8)); /* 雙層璀璨發光 */
@@ -157,7 +159,7 @@
 
 <div id="capture-area">
     <div class="main-container">
-        <!-- 表頭 LOGO：去背景 + 放大25% + 發光效果 -->
+        <!-- 表頭 LOGO：切去角落方形背景 -->
         <div class="header-container">
             <img class="header-logo" src="https://lh3.googleusercontent.com/d/1aooCsOuMMtwMhT5bay4kDQCAq9sbm3kW" crossorigin="anonymous" alt="Logo">
             <div class="header-title">🔥 攻守名單 🔥</div>
