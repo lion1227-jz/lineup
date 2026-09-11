@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - 攻守名單 V42</title>
+    <title>JZ BASEBALL TEAM - 攻守名單</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -11,16 +11,35 @@
 
         * { box-sizing: border-box; }
 
-        body { font-family: '微軟正黑體', Arial, sans-serif; background: #0a0512; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; color: #fff; }
+        /* 🌟 Google Sites 專用 reset：強制移除 body 邊距與水平滾動條 */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden;
+            background: #0a0512;
+            font-family: '微軟正黑體', Arial, sans-serif;
+            color: #fff;
+        }
 
-        /* 主畫布 */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 10px 5px;
+        }
+
+        /* 🌟 滿版彈性適應：自適應 100% 寬度，最大 920px */
         #capture-area {
-            width: 920px; height: auto; 
+            width: 100%;
+            max-width: 920px;
+            height: auto; 
             background-color: #0f081d;
             background-image: radial-gradient(circle at 50% 20%, #231249 0%, #0c0518 85%);
             display: flex; position: relative; overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.9);
-            padding: 25px 30px;
+            padding: 20px;
             border-radius: 12px;
             border: 1px solid rgba(179, 136, 255, 0.2);
         }
@@ -32,13 +51,11 @@
             margin-bottom: 15px; border-bottom: 2px solid rgba(244, 208, 63, 0.4); padding-bottom: 12px;
         }
         
-        /* 🌟 套用 SVG 灰階門檻濾鏡：完美去除方形黑底，只保留星星與雙層發光 🌟 */
         .header-logo { 
-            width: 82px; height: 82px; /* 放大 25% */
+            width: 75px; height: 75px; 
             object-fit: contain; 
-            filter: url(#remove-black-bg) 
-                    drop-shadow(0 0 8px rgba(244, 208, 63, 0.9)) 
-                    drop-shadow(0 0 18px rgba(179, 136, 255, 0.8));
+            border-radius: 50%;
+            filter: drop-shadow(0 0 10px rgba(244, 208, 63, 0.7));
         }
         
         .header-title { 
@@ -46,14 +63,11 @@
             letter-spacing: 4px; text-shadow: 0 0 12px rgba(179,136,255,0.6);
         }
 
-        /* 比賽資訊欄：無框透明星空風格 */
+        /* 比賽資訊區 */
         .game-info-grid { 
             display: grid; grid-template-columns: repeat(3, 1fr); 
-            gap: 15px; margin-bottom: 25px; 
-            width: 100%;
-            padding: 10px 0;
-            background: transparent;
-            border: none;
+            gap: 15px; margin-bottom: 20px; 
+            width: 100%; padding: 10px 0; background: transparent; border: none;
         }
         .info-cell { display: flex; align-items: center; gap: 6px; font-size: 18pt; color: #eee; min-height: 40px; min-width: 0; }
         .info-cell span { font-weight: bold; color: #F4D03F; white-space: nowrap; font-size: 18pt; flex-shrink: 0; text-shadow: 1px 1px 3px #000; }
@@ -72,18 +86,17 @@
             cursor: pointer; opacity: 1;
         }
 
-        .roster-split { display: flex; gap: 20px; width: 100%; }
+        .roster-split { display: flex; gap: 15px; width: 100%; }
         .starters-col { width: 57%; display: flex; flex-direction: column; }
         .bench-col { width: 43%; display: flex; flex-direction: column; }
 
         .lineup-list { display: flex; flex-direction: column; gap: 8px; }
         
-        /* 先發單列 */
         .lineup-row { 
             display: grid; 
-            grid-template-columns: 50px 75px 192px 40px; 
-            align-items: center; gap: 12px; 
-            background: rgba(255, 255, 255, 0.08); padding: 5px 15px; border-radius: 6px;
+            grid-template-columns: 50px 75px 1fr 40px; 
+            align-items: center; gap: 10px; 
+            background: rgba(255, 255, 255, 0.08); padding: 5px 12px; border-radius: 6px;
             border: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 2px 6px rgba(0,0,0,0.4);
             height: 50px;
@@ -98,7 +111,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* 守備位置：亮金純文字 */
         .pos-select {
             -webkit-appearance: none; appearance: none;
             background: transparent; border: none; 
@@ -108,7 +120,6 @@
         }
         .pos-select option { background: #1c0e36; color: #F4D03F; }
 
-        /* 姓名選單 */
         .player-select { 
             -webkit-appearance: none; appearance: none; 
             background: transparent; border: none; 
@@ -118,7 +129,6 @@
             cursor: pointer;
         }
 
-        /* 背號：紫色圓圈 + 金色數字 */
         .jersey-num { 
             font-family: 'Oswald', sans-serif; font-size: 18pt; font-weight: bold;
             color: #ffd700; 
@@ -128,23 +138,21 @@
             display: flex; align-items: center; justify-content: center;
             opacity: 0; transition: 0.3s; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.6);
-            margin-left: 12px; 
+            justify-self: end;
         }
         .jersey-num.active { opacity: 1; }
 
-        /* 預備球員單列 */
         .reserve-row { 
             display: grid; 
-            grid-template-columns: 50px 192px 40px; 
-            align-items: center; gap: 12px; 
-            background: rgba(255, 255, 255, 0.08); padding: 5px 15px; border-radius: 6px;
+            grid-template-columns: 50px 1fr 40px; 
+            align-items: center; gap: 10px; 
+            background: rgba(255, 255, 255, 0.08); padding: 5px 12px; border-radius: 6px;
             border: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 2px 6px rgba(0,0,0,0.4);
             height: 50px;
         }
         .reserve-row .order-num { font-size: 16pt; font-style: italic; background: #333; color: #bbb; }
         .reserve-row .player-select { width: 100%; font-size: 18pt; }
-        .reserve-row .jersey-num { margin-left: 12px; }
 
         .bottom-action-area { display: flex; gap: 15px; margin-top: 20px; justify-content: center; width: 100%; }
         button { font-size: 16pt; padding: 12px 28px; font-weight: bold; color: #fff; border: none; border-radius: 8px; cursor: pointer; background: #5e1d96; transition: 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
@@ -154,26 +162,13 @@
 </head>
 <body>
 
-<!-- 🌟 隱藏式去底濾器：將低於門檻的黑色/灰階背景強制轉為 100% 完全透明 🌟 -->
-<svg style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true">
-  <filter id="remove-black-bg" color-interpolation-filters="sRGB">
-    <feColorMatrix type="matrix" values="
-      1 0 0 0 0
-      0 1 0 0 0
-      0 0 1 0 0
-      3.5 3.5 3.5 0 -1.6" />
-  </filter>
-</svg>
-
 <div id="capture-area">
     <div class="main-container">
-        <!-- 表頭 LOGO：套用動態去黑底濾鏡 -->
         <div class="header-container">
             <img class="header-logo" src="https://lh3.googleusercontent.com/d/1aooCsOuMMtwMhT5bay4kDQCAq9sbm3kW" crossorigin="anonymous" alt="Logo">
             <div class="header-title">🔥 攻守名單 🔥</div>
         </div>
         
-        <!-- 比賽資訊區 -->
         <div class="game-info-grid">
             <div class="info-cell"><span>日期：</span><input type="date" id="game-date"></div>
             <div class="info-cell"><span>集合：</span><input type="time" value="08:00"></div>
@@ -192,11 +187,9 @@
         </div>
 
         <div class="roster-split">
-            <!-- 先發區 -->
             <div class="starters-col">
                 <div class="lineup-list" id="starters-board"></div>
                 <div class="lineup-list" style="margin-top: 8px;">
-                    <!-- 投手專用欄位 -->
                     <div class="lineup-row" id="sp-row">
                         <div class="order-num" style="background:#280b54;">P</div>
                         <select class="pos-select" disabled><option>P (1)</option></select>
@@ -206,7 +199,6 @@
                 </div>
             </div>
             
-            <!-- 預備區 -->
             <div class="bench-col">
                 <div class="lineup-list" id="reserves-board"></div>
             </div>
@@ -230,7 +222,6 @@
         const row = document.createElement('div');
         row.className = type === 'reserve' ? 'reserve-row' : 'lineup-row';
         if (type === 'starter') {
-            /* 順序：棒次 -> 守位 -> 姓名 -> 背號 */
             row.innerHTML = `
                 <div class="order-num">${index}棒</div>
                 <select class="pos-select">
