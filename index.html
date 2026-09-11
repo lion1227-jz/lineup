@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - 攻守名單 V38</title>
+    <title>JZ BASEBALL TEAM - 攻守名單 V39</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -13,7 +13,7 @@
 
         body { font-family: '微軟正黑體', Arial, sans-serif; background: #0a0512; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; color: #fff; }
 
-        /* 1. 畫面整體加寬至 920px，提供充足橫向空間 */
+        /* 整體畫布 */
         #capture-area {
             width: 920px; height: auto; 
             background-color: #0f081d;
@@ -29,33 +29,38 @@
 
         .header-container {
             display: flex; justify-content: center; align-items: center; gap: 15px;
-            margin-bottom: 20px; border-bottom: 2px solid rgba(244, 208, 63, 0.4); padding-bottom: 12px;
+            margin-bottom: 15px; border-bottom: 2px solid rgba(244, 208, 63, 0.4); padding-bottom: 12px;
         }
         
-        .header-logo-svg { width: 60px; height: 60px; fill: #F4D03F; filter: drop-shadow(0 0 6px rgba(244, 208, 63, 0.6)); }
+        /* 1. 恢復你的專屬 LOGO，並加上相容直連解析 */
+        .header-logo { 
+            width: 65px; height: 65px; object-fit: contain; 
+            filter: brightness(1.2) drop-shadow(0 0 6px rgba(244, 208, 63, 0.6)); 
+        }
         
         .header-title { 
             font-family: 'Oswald', sans-serif; font-size: 28pt; font-weight: bold; color: #fff; 
             letter-spacing: 4px; text-shadow: 0 0 12px rgba(179,136,255,0.6);
         }
 
-        /* 1. 比賽資訊欄：輸入框大幅加寬至 195px，徹底解決圖示擋字問題 */
+        /* 2. 比賽資訊欄：完全「去框化」，完美融入星空背景 */
         .game-info-grid { 
             display: grid; grid-template-columns: repeat(3, 1fr); 
             gap: 15px; margin-bottom: 25px; 
-            background: rgba(22, 12, 42, 0.85); padding: 20px 22px; border-radius: 10px;
-            border: 1px solid rgba(244, 208, 63, 0.3);
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
             width: 100%;
+            padding: 10px 20px;
+            background: transparent; /* 移除背景 */
+            border: none;            /* 移除邊框 */
+            box-shadow: none;        /* 移除陰影 */
         }
         .info-cell { display: flex; align-items: center; gap: 8px; font-size: 18pt; color: #eee; min-height: 40px; }
-        .info-cell span { font-weight: bold; color: #F4D03F; white-space: nowrap; font-size: 18pt; flex-shrink: 0; }
+        .info-cell span { font-weight: bold; color: #F4D03F; white-space: nowrap; font-size: 18pt; flex-shrink: 0; text-shadow: 1px 1px 3px #000;}
         
         .game-info-grid input, .game-info-grid select { 
             background: transparent; border: none; color: #fff; font-size: 18pt; font-weight: bold; outline: none; cursor: pointer; 
-            width: 195px; /* 加寬確保容納所有文字與圖示 */
+            width: 195px;
             border-bottom: 2px solid rgba(244, 208, 63, 0.5); padding-bottom: 3px;
-            line-height: 1.4;
+            line-height: 1.4; text-shadow: 1px 1px 3px #000;
         }
         select option { background: #1c0e36; color: #fff; font-size: 14pt; }
 
@@ -71,9 +76,7 @@
 
         .lineup-list { display: flex; flex-direction: column; gap: 8px; }
         
-        /* 3. 先發名單網格精準控制：
-           棒次(50px) | 守位(75px) | 姓名(192px=8個全形字) | 背號(40px)
-           Base gap 設為 12px */
+        /* 先發名單網格精準控制：棒次 | 守位 | 姓名(8字寬) | 背號 */
         .lineup-row { 
             display: grid; 
             grid-template-columns: 50px 75px 192px 40px; 
@@ -92,17 +95,17 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* 2. 守備位置：移除黃色邊框與背景，呈現乾淨的亮黃金純文字 */
+        /* 守備位置：乾淨亮黃金純文字 */
         .pos-select {
             -webkit-appearance: none; appearance: none;
-            background: transparent; border: none; /* 移除黃色框 */
+            background: transparent; border: none; 
             color: #F4D03F; font-family: 'Oswald', sans-serif; font-size: 16pt; font-weight: bold;
             width: 100%; height: 38px; text-align: center; cursor: pointer; outline: none;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
         }
         .pos-select option { background: #1c0e36; color: #F4D03F; }
 
-        /* 3. 姓名：寬度 100% (繼承父格的 192px，剛好 8 個 18pt 的全形字寬) */
+        /* 姓名：鎖定 8 個 18pt 全形字寬 */
         .player-select { 
             -webkit-appearance: none; appearance: none; 
             background: transparent; border: none; 
@@ -112,7 +115,7 @@
             cursor: pointer;
         }
 
-        /* 3. 背號與姓名的距離：gap(12px) + margin-left(12px) = 24px (精準等於 1 個全形字元寬度) */
+        /* 背號：與姓名距離 1 個全形字元寬度 (gap 12px + margin 12px = 24px) */
         .jersey-num { 
             font-family: 'Oswald', sans-serif; font-size: 18pt; font-weight: bold;
             color: #ffd700; 
@@ -122,11 +125,11 @@
             display: flex; align-items: center; justify-content: center;
             opacity: 0; transition: 0.3s; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.6);
-            margin-left: 12px; /* 加上 Grid 的 gap，總距剛好一個全形字 */
+            margin-left: 12px; 
         }
         .jersey-num.active { opacity: 1; }
 
-        /* 預備球員單列：姓名同樣鎖定 192px (8字寬) */
+        /* 預備球員單列 */
         .reserve-row { 
             display: grid; 
             grid-template-columns: 45px 192px 40px; 
@@ -148,15 +151,13 @@
 
 <div id="capture-area">
     <div class="main-container">
-        <!-- SVG 高清圖示 -->
+        <!-- 真正引用你的 Google Drive 圖片，透過 uc?export=view 直連解析 -->
         <div class="header-container">
-            <svg class="header-logo-svg" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 13v1c0 1.1.9 2 2 2v2.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-            </svg>
+            <img class="header-logo" src="https://drive.google.com/uc?export=view&id=1aooCsOuMMtwMhT5bay4kDQCAq9sbm3kW" crossorigin="anonymous">
             <div class="header-title">🔥 攻守名單 🔥</div>
         </div>
         
-        <!-- 比賽資訊區 (加寬版) -->
+        <!-- 比賽資訊區 (完全去框化，完美融入背景) -->
         <div class="game-info-grid">
             <div class="info-cell"><span>日期：</span><input type="date" id="game-date"></div>
             <div class="info-cell"><span>集合：</span><input type="time" value="08:00"></div>
@@ -206,7 +207,9 @@
     document.getElementById('game-date').value = new Date().toISOString().split('T')[0];
     const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQE8qU7MUo8mltMrnQSLttK1ePGuN2ooTaD3QBtoKsmvrW5tEKOjSXwGm9bwhZtgy2veLF-QLTpe33q/pub?output=csv";
     let playersData = [];
-    const posList = ["C (2)", "1B (3)", "2B (4)", "3B (5)", "SS (6)", "LF (7)", "CF (8)", "RF (9)", "DH"];
+    
+    /* 3. 守備位置清單加入 PDH */
+    const posList = ["C (2)", "1B (3)", "2B (4)", "3B (5)", "SS (6)", "LF (7)", "CF (8)", "RF (9)", "DH", "PDH"];
 
     function createRow(index, type, container) {
         const row = document.createElement('div');
