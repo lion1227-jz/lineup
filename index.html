@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JZ BASEBALL TEAM - 攻守名單</title>
+    <title>JZ球員名單</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700;400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700;500&display=swap');
 
         * { box-sizing: border-box; }
 
@@ -29,7 +29,7 @@
             padding: 5px;
         }
 
-        /* 🌟 主畫布：大幅縮減內距 (12px) 節省垂直空間 */
+        /* 主畫布 */
         #capture-area {
             width: 100%;
             max-width: 900px;
@@ -40,33 +40,92 @@
             box-shadow: 0 8px 24px rgba(0,0,0,0.9);
             padding: 12px 18px;
             border-radius: 10px;
-            border: 1px solid rgba(179, 136, 255, 0.2);
+            border: 1px solid rgba(179, 136, 255, 0.25);
         }
 
         .main-container { width: 100%; display: flex; flex-direction: column; position: relative; z-index: 2; }
 
-        /* 🌟 表頭緊緻化：LOGO (50px)、標題 (22pt)、下邊距縮窄 */
+        /* ⚾️ 頂級熱血表頭：投手剪影(左) + 指定LOGO標題(中) + 8連擊左打殘影(右) ⚾️ */
         .header-container {
-            display: flex; justify-content: center; align-items: center; gap: 12px;
-            margin-bottom: 8px; border-bottom: 2px solid rgba(244, 208, 63, 0.4); padding-bottom: 6px;
-        }
-        
-        .header-logo { 
-            width: 50px; height: 50px; 
-            object-fit: contain; 
-            border-radius: 50%;
-            filter: drop-shadow(0 0 8px rgba(244, 208, 63, 0.7));
-        }
-        
-        .header-title { 
-            font-family: 'Oswald', sans-serif; font-size: 22pt; font-weight: bold; color: #fff; 
-            letter-spacing: 3px; text-shadow: 0 0 10px rgba(179,136,255,0.6);
+            display: grid;
+            grid-template-columns: 140px 1fr 220px;
+            align-items: center;
+            margin-bottom: 5px; /* 表頭與比賽資訊靠攏 */
+            padding-bottom: 5px;
+            border-bottom: 1.5px solid rgba(179, 136, 255, 0.3);
+            position: relative;
         }
 
-        /* 🌟 比賽資訊區緊緻化 */
+        /* 左側：右手投手側面紫色漸層剪影 */
+        .pitcher-box {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            height: 60px;
+        }
+        .pitcher-svg {
+            width: 90px;
+            height: 55px;
+            filter: drop-shadow(0 0 6px rgba(179, 136, 255, 0.6));
+        }
+
+        /* 中間：使用指定 Google Drive 圖片，並套用紫色發光效果 */
+        .header-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .logo-glow-wrapper {
+            position: relative;
+            width: 55px; height: 55px;
+            border-radius: 50%;
+            /* 調整光暈與透明度，讓你的指定LOGO完美呈現 */
+            background: radial-gradient(circle, rgba(123, 31, 162, 0.6) 0%, rgba(49, 27, 146, 0.2) 70%);
+            box-shadow: 0 0 15px #9c27b0, 0 0 30px #7b1fa2, inset 0 0 10px #e1bee7;
+            display: flex; align-items: center; justify-content: center;
+            padding: 2px;
+        }
+
+        .header-logo {
+            width: 50px; height: 50px;
+            object-fit: contain;
+            border-radius: 50%;
+            /* 修復 Google Drive 無法直接載入的問題，改用 uc?export=view 直連 */
+        }
+
+        .header-title {
+            font-family: '微軟正黑體', sans-serif;
+            font-size: 20pt;
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: 3px;
+            text-shadow: 0 0 12px rgba(179, 136, 255, 0.8), 2px 2px 4px #000;
+            line-height: 1.1;
+        }
+
+        /* 右側：8連擊左打者殘影 (由右至左漸淡) */
+        .batter-sequence {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 2px;
+            height: 60px;
+        }
+
+        .batter-frame {
+            width: 24px;
+            height: 48px;
+            flex-shrink: 0;
+            filter: drop-shadow(0 0 4px rgba(179, 136, 255, 0.4));
+        }
+
+        /* 比賽資訊區 (緊接表頭) */
         .game-info-grid { 
             display: grid; grid-template-columns: repeat(3, 1fr); 
-            gap: 6px 12px; margin-bottom: 10px; 
+            gap: 6px 12px; margin-bottom: 12px; 
             width: 100%; padding: 0; background: transparent; border: none;
         }
         .info-cell { display: flex; align-items: center; gap: 4px; font-size: 16pt; color: #eee; min-height: 32px; min-width: 0; }
@@ -86,22 +145,28 @@
             cursor: pointer; opacity: 1;
         }
 
-        .roster-split { display: flex; gap: 12px; width: 100%; }
-        .starters-col { width: 57%; display: flex; flex-direction: column; }
-        .bench-col { width: 43%; display: flex; flex-direction: column; }
+        /* 🌟 名單區域：預備球員緊貼先發球員 (居中排列 + 12px 緊密間距) */
+        .roster-split { 
+            display: flex; 
+            gap: 12px; 
+            width: 100%; 
+            justify-content: center; 
+        }
+        .starters-col { display: flex; flex-direction: column; }
+        .bench-col { display: flex; flex-direction: column; }
 
-        /* 🌟 名單垂直間距緊縮 */
         .lineup-list { display: flex; flex-direction: column; gap: 5px; }
         
-        /* 🌟 先發單列高度降至 42px */
+        /* 先發單列 */
         .lineup-row { 
             display: grid; 
-            grid-template-columns: 45px 65px 1fr 34px; 
+            grid-template-columns: 45px 65px 170px 34px; 
             align-items: center; gap: 8px; 
             background: rgba(255, 255, 255, 0.08); padding: 3px 10px; border-radius: 5px;
             border: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
             height: 42px;
+            width: fit-content;
         } 
         
         .order-num { 
@@ -117,7 +182,7 @@
             -webkit-appearance: none; appearance: none;
             background: transparent; border: none; 
             color: #F4D03F; font-family: 'Oswald', sans-serif; font-size: 15pt; font-weight: bold;
-            width: 100%; height: 32px; text-align: center; cursor: pointer; outline: none;
+            width: 65px; height: 32px; text-align: center; cursor: pointer; outline: none;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
         }
         .pos-select option { background: #1c0e36; color: #F4D03F; }
@@ -126,7 +191,7 @@
             -webkit-appearance: none; appearance: none; 
             background: transparent; border: none; 
             color: #fff; font-size: 16pt; font-weight: bold; outline: none; 
-            width: 100%; height: 32px; line-height: 32px;
+            width: 170px; height: 32px; line-height: 32px;
             padding: 0; text-shadow: 1px 1px 3px #000;
             cursor: pointer;
         }
@@ -140,25 +205,26 @@
             display: flex; align-items: center; justify-content: center;
             opacity: 0; transition: 0.3s; 
             box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            justify-self: end;
+            justify-self: center;
         }
         .jersey-num.active { opacity: 1; }
 
-        /* 🌟 預備球員單列同步縮至 42px */
+        /* 預備球員單列 */
         .reserve-row { 
             display: grid; 
-            grid-template-columns: 45px 1fr 34px; 
+            grid-template-columns: 45px 170px 34px; 
             align-items: center; gap: 8px; 
             background: rgba(255, 255, 255, 0.08); padding: 3px 10px; border-radius: 5px;
             border: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
             height: 42px;
+            width: fit-content;
         }
         .reserve-row .order-num { font-size: 14pt; font-style: italic; background: #333; color: #bbb; }
-        .reserve-row .player-select { width: 100%; font-size: 16pt; }
+        .reserve-row .player-select { width: 170px; font-size: 16pt; }
 
-        /* 🌟 底部按鈕區縮邊 */
-        .bottom-action-area { display: flex; gap: 12px; margin-top: 10px; justify-content: center; width: 100%; }
+        /* 底部按鈕區 */
+        .bottom-action-area { display: flex; gap: 12px; margin-top: 12px; justify-content: center; width: 100%; }
         button { font-size: 14pt; padding: 8px 22px; font-weight: bold; color: #fff; border: none; border-radius: 6px; cursor: pointer; background: #5e1d96; transition: 0.3s; box-shadow: 0 3px 8px rgba(0,0,0,0.5); }
         button:hover { background: #7b2cbf; }
         #share-line-btn { background: #06C755; }
@@ -168,11 +234,73 @@
 
 <div id="capture-area">
     <div class="main-container">
+        <!-- ⚾️ 頂級熱血表頭 ⚾️ -->
         <div class="header-container">
-            <img class="header-logo" src="https://lh3.googleusercontent.com/d/1aooCsOuMMtwMhT5bay4kDQCAq9sbm3kW" crossorigin="anonymous" alt="Logo">
-            <div class="header-title">🔥 攻守名單 🔥</div>
+            <!-- 左側：右手投手側面紫色橫向漸層剪影 (出手瞬息) -->
+            <div class="pitcher-box">
+                <svg class="pitcher-svg" viewBox="0 0 100 60">
+                    <defs>
+                        <linearGradient id="pitcherGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#311B92" stop-opacity="0.4"/>
+                            <stop offset="60%" stop-color="#7B1FA2" stop-opacity="0.9"/>
+                            <stop offset="100%" stop-color="#E1BEE7" stop-opacity="1"/>
+                        </linearGradient>
+                    </defs>
+                    <!-- 投手出手動作路徑 -->
+                    <path fill="url(#pitcherGrad)" d="M10,50 C15,45 18,35 20,25 C22,15 28,10 35,12 C40,14 42,20 40,26 C36,32 30,40 25,50 Z M38,15 C42,10 50,8 55,12 C60,16 58,22 52,26 Z M55,13 L85,22 L88,20 L85,24 L78,25 Z M22,35 L38,48 L55,52 L50,58 Z"/>
+                    <!-- 投出的球與軌跡殘影 -->
+                    <circle cx="92" cy="21" r="3" fill="#F4D03F" filter="drop-shadow(0 0 4px #F4D03F)"/>
+                    <line x1="82" y1="22" x2="89" y2="21" stroke="#F4D03F" stroke-width="1.5" stroke-dasharray="2 1"/>
+                </svg>
+            </div>
+
+            <!-- 中間：修改為你指定的圖檔 + 紫色光暈，緊接標題 -->
+            <div class="header-center">
+                <div class="logo-glow-wrapper">
+                    <!-- 使用 uc?export=view 直連 Google Drive 圖檔 -->
+                    <img class="header-logo" src="https://drive.google.com/uc?export=view&id=169Ugz1a9gpJXg0xtQsVNZUEXjEXvfxvZ" crossorigin="anonymous" alt="Logo">
+                </div>
+                <div class="header-title">JZ球員名單</div>
+            </div>
+
+            <!-- 右側：8連擊左打者連續揮棒動作 (從右至左漸淡 opacity 1.0 -> 0.15) -->
+            <div class="batter-sequence">
+                <!-- Frame 1 (最左/最淡 0.15) -->
+                <svg class="batter-frame" style="opacity: 0.15" viewBox="0 0 30 50">
+                    <path fill="#D1C4E9" d="M15,8 A4,4 0 1,1 15,0 A4,4 0 1,1 15,8 M10,12 L20,10 L22,25 L16,24 L14,48 L8,48 L12,24 Z M22,10 L26,2 L28,4 L24,12 Z"/>
+                </svg>
+                <!-- Frame 2 (0.27) -->
+                <svg class="batter-frame" style="opacity: 0.27" viewBox="0 0 30 50">
+                    <path fill="#D1C4E9" d="M14,8 A4,4 0 1,1 14,0 A4,4 0 1,1 14,8 M9,12 L19,10 L22,24 L16,24 L13,48 L7,48 L11,24 Z M19,10 L25,4 L27,6 L21,12 Z"/>
+                </svg>
+                <!-- Frame 3 (0.39) -->
+                <svg class="batter-frame" style="opacity: 0.39" viewBox="0 0 30 50">
+                    <path fill="#B388FF" d="M13,8 A4,4 0 1,1 13,0 A4,4 0 1,1 13,8 M8,12 L18,11 L20,25 L15,24 L12,48 L6,48 L10,24 Z M18,11 L26,10 L28,12 L20,14 Z"/>
+                </svg>
+                <!-- Frame 4 (0.51) -->
+                <svg class="batter-frame" style="opacity: 0.51" viewBox="0 0 30 50">
+                    <path fill="#B388FF" d="M12,8 A4,4 0 1,1 12,0 A4,4 0 1,1 12,8 M7,12 L17,12 L18,26 L14,24 L11,48 L5,48 L9,24 Z M17,12 L27,16 L27,18 L18,15 Z"/>
+                </svg>
+                <!-- Frame 5 (0.63) -->
+                <svg class="batter-frame" style="opacity: 0.63" viewBox="0 0 30 50">
+                    <path fill="#7C4DFF" d="M11,8 A4,4 0 1,1 11,0 A4,4 0 1,1 11,8 M6,12 L16,14 L16,27 L12,24 L10,48 L4,48 L8,24 Z M16,14 L24,22 L23,24 L15,17 Z"/>
+                </svg>
+                <!-- Frame 6 (0.75) -->
+                <svg class="batter-frame" style="opacity: 0.75" viewBox="0 0 30 50">
+                    <path fill="#7C4DFF" d="M10,8 A4,4 0 1,1 10,0 A4,4 0 1,1 10,8 M5,12 L15,16 L14,28 L11,24 L9,48 L3,48 L7,24 Z M15,16 L20,27 L18,28 L13,18 Z"/>
+                </svg>
+                <!-- Frame 7 (0.87) -->
+                <svg class="batter-frame" style="opacity: 0.87" viewBox="0 0 30 50">
+                    <path fill="#F4D03F" d="M10,8 A4,4 0 1,1 10,0 A4,4 0 1,1 10,8 M5,12 L14,18 L12,29 L10,24 L8,48 L2,48 L6,24 Z M14,18 L15,31 L13,31 L11,20 Z"/>
+                </svg>
+                <!-- Frame 8 (最右/最實 1.0 完棒動作) -->
+                <svg class="batter-frame" style="opacity: 1.0" viewBox="0 0 30 50">
+                    <path fill="#F4D03F" d="M9,8 A4,4 0 1,1 9,0 A4,4 0 1,1 9,8 M4,12 L13,20 L11,30 L9,24 L7,48 L1,48 L5,24 Z M13,20 L10,34 L8,33 L10,21 Z"/>
+                </svg>
+            </div>
         </div>
         
+        <!-- 比賽資訊區 -->
         <div class="game-info-grid">
             <div class="info-cell"><span>日期：</span><input type="date" id="game-date"></div>
             <div class="info-cell"><span>集合：</span><input type="time" value="08:00"></div>
@@ -190,6 +318,7 @@
             <div class="info-cell"><span>對戰：</span><input type="text" placeholder="對手名稱..."></div>
         </div>
 
+        <!-- 名單區 (居中緊貼) -->
         <div class="roster-split">
             <div class="starters-col">
                 <div class="lineup-list" id="starters-board"></div>
